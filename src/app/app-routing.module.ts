@@ -10,6 +10,8 @@ const routes: Routes = [
   { path: 'account', component: AccountComponent, pathMatch: 'full' },
 
   { path: '', redirectTo: '/home', pathMatch: 'full' },
+  { path: '/:any', redirectTo: '/home', pathMatch: 'full' },
+
 ];
 
 @NgModule({
