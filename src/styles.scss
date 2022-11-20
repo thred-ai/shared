@@ -699,7 +699,7 @@ progress {
 .frame-container {
   overflow: hidden;
   width: 100vw;
-  height: calc(var(--vh, 1vh) * 100)
+  height: calc(var(--vh, 1vh) * 100);
 }
 
 .frame-header {
@@ -723,7 +723,6 @@ progress {
 .mat-slide-toggle.mat-checked .mat-slide-toggle-ripple .mat-ripple-element {
   background-color: #761de3;
 }
-
 
 @media (min-width: 768px) {
   .position-md-static {
@@ -2586,7 +2585,7 @@ textarea.form-control-lg {
   text-shadow: 0 0 0 #212529;
 }
 
-.text-shadow{
+.text-shadow {
   text-shadow: 1px 0 2px #212529;
 }
 
@@ -11946,9 +11945,9 @@ mat-sidenav {
   opacity: 0.5;
 }
 
-mat-calendar.no-header{
-  mat-calendar-header{
-    .mat-calendar-header{
+mat-calendar.no-header {
+  mat-calendar-header {
+    .mat-calendar-header {
       display: none;
     }
   }
@@ -12079,4 +12078,13 @@ mat-calendar.no-header{
 
 .bar-hover:hover {
   background-color: #e9e9e9 !important;
+}
+
+.body {
+  background-color: #1b002e;
+}
+
+.bar {
+  background-color: #23003b;
+  border-color: rgb(170, 117, 221) !important;
 }

@@ -27,7 +27,9 @@ export class AppComponent {
     },
   ];
 
-  constructor(private router: ActivatedRoute) {}
+  constructor(private router: ActivatedRoute) {
+    console.log((window as any).authToken)
+  }
 
   ngOnInit() {
     let url =

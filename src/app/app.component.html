@@ -1,6 +1,6 @@
-<div class="w-100 bg-white" style="min-height: 77.5vh">
+<div class="w-100 body" style="min-height: 77.5vh">
   <div
-    class="w-100 border-bottom bg-white mt-0 d-flex justify-content-center align-items-center flex-column fw-bold"
+    class="w-100 border-bottom bar text-white mt-0 d-flex justify-content-center align-items-center flex-column fw-bold"
     style="height: 10vh; position: fixed; z-index: 50; top: 0; font-size: large"
     id="top-bar"
   >
@@ -8,7 +8,7 @@
   </div>
   <div
     class="w-100"
-    style="min-height: 77.5vh; padding-top: 10vh; margin-bottom: 10vh"
+    style="min-height: 77.5vh; padding-top: 10vh; padding-bottom: 10vh"
   >
     <router-outlet></router-outlet>
     <!-- (activate)="onActivate($event)"
@@ -19,17 +19,17 @@
   }" -->
   </div>
   <mat-toolbar
-    class="toolbarNav w-100 shadow bg-white border-top"
+    class="toolbarNav w-100 shadow border-top bar"
     style="height: 10vh"
   >
     <button
       *ngFor="let tab of tabs ?? []"
       mat-flat-button
-      routerLink="{{tab.link}}"
+      routerLink="{{ tab.link }}"
       routerLinkActive="active-link"
       (click)="title = tab.name"
     >
-      <mat-icon class="material-icons color_blue"> {{tab.icon}}</mat-icon>
+      <mat-icon class="material-icons color_blue"> {{ tab.icon }}</mat-icon>
       <span>{{ tab.name }}</span>
     </button>
   </mat-toolbar>
