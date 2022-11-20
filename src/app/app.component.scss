@@ -1,0 +1,37 @@
+.toolbarNav {
+  position: fixed;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+
+  padding: 0;
+
+  width: 100%;
+
+  button {
+    display: flex;
+
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    border-radius: 0;
+    height: 100%;
+    mat-icon {
+      font-size: 35px;
+      width: 100%;
+    }
+    span {
+      display: block;
+      font-size: 9px;
+      width: 100%;
+    }
+  }
+}
+
+button:hover,
+.active-link {
+  color: blueviolet;
+}
