@@ -5,9 +5,9 @@ import { HomeComponent } from './home/home.component';
 import { StoreComponent } from './store/store.component';
 
 const routes: Routes = [
-  { path: 'store', component: StoreComponent, pathMatch: 'full' },
-  { path: 'home', component: HomeComponent, pathMatch: 'full' },
-  { path: 'account', component: AccountComponent, pathMatch: 'full' },
+  { path: '/store', component: StoreComponent, pathMatch: 'full' },
+  { path: '/home', component: HomeComponent, pathMatch: 'full' },
+  { path: '/account', component: AccountComponent, pathMatch: 'full' },
 
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   { path: '/:any', redirectTo: '/home', pathMatch: 'full' },
