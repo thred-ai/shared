@@ -33,7 +33,7 @@ export class AppComponent {
   }
 
   ngOnInit() {
-    document.body.classList.add("body")
+    document.body.classList.add("bar")
     let url =
       window.location.pathname == '/' ? '/home' : window.location.pathname;
     console.log(url);

@@ -36,9 +36,18 @@
   </ng-container>
   <ng-container *ngIf="!apps">
     <div
-      class="w-100 vh-80 d-flex justify-content-center align-items-center no-select position-fixed"
+      class="w-100 vh-80 d-flex justify-content-center flex-column align-items-center no-select position-fixed animate__animated animate__fadeIn"
     >
-      <div class="loading-spinner"></div>
+      <div id="fly">
+        <i></i>
+        <i></i>
+        <i></i>
+        <i></i>
+      </div>
+      <div id="cursor">
+        <i></i>
+        <i></i>
+      </div>
     </div>
   </ng-container>
 </div>

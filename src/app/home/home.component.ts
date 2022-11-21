@@ -13,6 +13,24 @@ export class HomeComponent implements OnInit {
   constructor(private loadService: LoadService, private root: AppComponent) {}
 
   async ngOnInit() {
+    document.body.addEventListener('mousemove', function (e) {
+      var fly = document.getElementById('fly');
+
+      fly!.style.left = e.pageX + 'px';
+      fly!.style.top = e.pageY - 100 + 'px';
+
+      var cursor = document.getElementById('cursor');
+      cursor!.style.display = 'block';
+
+      cursor!.style.display = 'block';
+      cursor!.style.left = e.pageX + 'px';
+      cursor!.style.top = e.pageY - 100 + 'px';
+
+      setTimeout(() => {
+        cursor!.style.display = 'none';
+      }, 1000);
+    });
+
     let signedInUser =
       (await this.loadService.currentUser)?.uid ??
       '0xd31c54eFD3A4B5E6a993AaA4618D3700a12ff752';
@@ -24,9 +42,7 @@ export class HomeComponent implements OnInit {
 
   apps?: App[];
 
-  openApp(){
-    
-  }
+  openApp() {}
 
   loadApps(
     user: string,
@@ -46,10 +62,12 @@ export class HomeComponent implements OnInit {
 
           let filtered = [...new Set(data.filter((d) => d != ''))];
 
-          this.loadService.getItems(filtered, (apps) => {
+          this.loadService.getNewItems((apps) => {
             // this.loading = false;
             // this.mode = 1;
-            this.apps = apps?.concat(apps).concat(apps).concat(apps).concat(apps).concat(apps).concat(apps).concat(apps).concat(apps).concat(apps).concat(apps).concat(apps).concat(apps).concat(apps).concat(apps).concat(apps).concat(apps).concat(apps).concat(apps).concat(apps).concat(apps).concat(apps).concat(apps).concat(apps).concat(apps).concat(apps).concat(apps) ?? [];
+            setTimeout(() => {
+              this.apps = apps ?? [];
+            }, 500);
           });
         } catch (error) {
           // this.loading = false;

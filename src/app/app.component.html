@@ -1,38 +1,39 @@
-  
-  <div
-    class="w-100 body border-pink border-top border-2"
-    style="min-height: 57.5vh; padding-top: 10vh; padding-bottom: 10vh;"
-  >
+<div
+  class="w-100 bar border-pink border-top border-2"
+  style="min-height: 57.5vh; padding-top: 10vh; padding-bottom: 10vh"
+>
   <div
     class="w-100 text-white py-3 d-flex justify-content-center align-items-center flex-column border-pink border-top border-2 no-select"
-    style="top: 0; font-size: large; position:fixed; z-index: 50;"
+    style="top: 0; font-size: large; position: fixed; z-index: 50"
     id="top-bar"
   >
-  <span class="px-4 py-2 border-pink border shadow-lg rounded-pill no-select" style="background-color: rgba(0, 0, 0, 0.9);">
-    {{ title }}
-  </span>
-
+    <span
+      class="px-4 py-2 border-pink border shadow-lg rounded-pill no-select"
+      style="background-color: rgba(0, 0, 0, 0.9)"
+    >
+      {{ title }}
+    </span>
   </div>
-    <router-outlet></router-outlet>
-    <!-- (activate)="onActivate($event)"
+  <router-outlet></router-outlet>
+  <!-- (activate)="onActivate($event)"
   [ngRouterOutletComm]="{
     type: 'parent',
     sender: sendToChildEmitter,
     receiver: onChildEvent.bind(this)
   }" -->
-  </div>
-  <mat-toolbar
-    class="toolbarNav w-100 shadow border-top bar"
-    style="height: 10vh"
+</div>
+<mat-toolbar
+  class="toolbarNav w-100 shadow border-top bar"
+  style="height: 10vh"
+>
+  <button
+    *ngFor="let tab of tabs ?? []"
+    mat-flat-button
+    routerLink="{{ tab.link }}"
+    routerLinkActive="active-link"
+    (click)="title = tab.name"
   >
-    <button
-      *ngFor="let tab of tabs ?? []"
-      mat-flat-button
-      routerLink="{{ tab.link }}"
-      routerLinkActive="active-link"
-      (click)="title = tab.name"
-    >
-      <mat-icon class="material-icons color_blue"> {{ tab.icon }}</mat-icon>
-      <span>{{ tab.name }}</span>
-    </button>
-  </mat-toolbar>
+    <mat-icon class="material-icons color_blue"> {{ tab.icon }}</mat-icon>
+    <span>{{ tab.name }}</span>
+  </button>
+</mat-toolbar>
