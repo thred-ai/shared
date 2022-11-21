@@ -1,3 +1,33 @@
-<div class="w-100" style="min-height: 77.5vh">
-    
+<div class="w-100" style="min-height: 57.5vh">
+  <div class="w-100 row row-cols-4 justify-content-start p-2 pt-4 p-md-5 gx-0">
+    <div
+      class="col text-center p-2-5 pt-0 pb-0 p-md-4 px-md-5 no-select"
+      *ngFor="let app of apps ?? []"
+    >
+      <div
+        class="w-100 app-icon rounded-15 shadow p-0"
+        style="overflow: hidden; aspect-ratio: 1"
+        role="button"
+        (click)="openApp()"
+      >
+        <div class="w-100" style="aspect-ratio: 1">
+          <img
+            class="w-100 h-100"
+            style="
+              object-fit: contain;
+
+              pointer-events: none;
+            "
+            [src]="app.displayUrls[0]"
+          />
+        </div>
+      </div>
+      <p
+        class="text-center mt-2 text-truncate w-100 pb-0 text-white"
+        style="font-size: x-small"
+      >
+        {{ app.name }}
+      </p>
+    </div>
+  </div>
 </div>

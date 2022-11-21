@@ -1,15 +1,18 @@
-<div class="w-100 body" style="min-height: 77.5vh">
+  
   <div
-    class="w-100 border-bottom bar text-white mt-0 d-flex justify-content-center align-items-center flex-column fw-bold"
-    style="height: 10vh; position: fixed; z-index: 50; top: 0; font-size: large"
+    class="w-100 body border-pink border-top border-2"
+    style="min-height: 57.5vh; padding-top: 10vh; padding-bottom: 10vh;"
+  >
+  <div
+    class="w-100 text-white py-3 d-flex justify-content-center align-items-center flex-column border-pink border-top border-2"
+    style="top: 0; font-size: large; position:fixed"
     id="top-bar"
   >
+  <span class="px-4 py-2 border-pink border shadow-lg rounded-pill" style="background-color: rgba(0, 0, 0, 0.9);">
     {{ title }}
+  </span>
+
   </div>
-  <div
-    class="w-100"
-    style="min-height: 77.5vh; padding-top: 10vh; padding-bottom: 10vh"
-  >
     <router-outlet></router-outlet>
     <!-- (activate)="onActivate($event)"
   [ngRouterOutletComm]="{
@@ -33,4 +36,3 @@
       <span>{{ tab.name }}</span>
     </button>
   </mat-toolbar>
-</div>

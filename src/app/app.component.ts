@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { LoadService } from './load.service';
 
 @Component({
   selector: 'app-root',
@@ -27,11 +28,12 @@ export class AppComponent {
     },
   ];
 
-  constructor(private router: ActivatedRoute) {
+  constructor(private router: ActivatedRoute, private loadService: LoadService) {
     console.log((window as any).authToken)
   }
 
   ngOnInit() {
+    document.body.classList.add("body")
     let url =
       window.location.pathname == '/' ? '/home' : window.location.pathname;
     console.log(url);
