@@ -22,7 +22,7 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  apps: App[] = [];
+  apps?: App[];
 
   openApp(){
     

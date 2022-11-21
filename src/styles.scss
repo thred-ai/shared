@@ -12100,3 +12100,39 @@ mat-calendar.no-header {
 .border-pink{
   border-color: rgb(170, 117, 221) !important;
 }
+
+.no-select {
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: not-allowed; /*makes it even more obvious*/
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-touch-callout: none;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+}
+.loading-spinner:after {
+
+  --color: rgb(170, 117, 221);
+
+  content: " ";
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 8px;
+  border-radius: 50%;
+  border: 6px solid var(--color);
+  border-color: var(--color) transparent var(--color) transparent;
+  animation: loading-spinner 1.2s linear infinite;
+}
+@keyframes loading-spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

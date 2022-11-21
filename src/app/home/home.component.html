@@ -1,33 +1,44 @@
 <div class="w-100" style="min-height: 57.5vh">
-  <div class="w-100 row row-cols-4 justify-content-start p-2 pt-4 p-md-5 gx-0">
+  <ng-container *ngIf="apps">
     <div
-      class="col text-center p-2-5 pt-0 pb-0 p-md-4 px-md-5 no-select"
-      *ngFor="let app of apps ?? []"
+      class="w-100 row row-cols-4 justify-content-start p-2 pt-4 p-md-5 gx-0"
     >
       <div
-        class="w-100 app-icon rounded-15 shadow p-0"
-        style="overflow: hidden; aspect-ratio: 1"
-        role="button"
-        (click)="openApp()"
+        class="col text-center p-2-5 pt-0 pb-0 p-md-4 px-md-5 no-select"
+        *ngFor="let app of apps ?? []"
       >
-        <div class="w-100" style="aspect-ratio: 1">
-          <img
-            class="w-100 h-100"
-            style="
-              object-fit: contain;
+        <div
+          class="w-100 app-icon rounded-15 shadow p-0 animate__animated animate__fadeIn"
+          style="overflow: hidden; aspect-ratio: 1"
+          role="button"
+          (click)="openApp()"
+        >
+          <div class="w-100" style="aspect-ratio: 1">
+            <img
+              class="w-100 h-100"
+              style="
+                object-fit: contain;
 
-              pointer-events: none;
-            "
-            [src]="app.displayUrls[0]"
-          />
+                pointer-events: none;
+              "
+              [src]="app.displayUrls[0]"
+            />
+          </div>
         </div>
+        <p
+          class="text-center mt-2 text-truncate w-100 pb-0 text-white"
+          style="font-size: x-small"
+        >
+          {{ app.name }}
+        </p>
       </div>
-      <p
-        class="text-center mt-2 text-truncate w-100 pb-0 text-white"
-        style="font-size: x-small"
-      >
-        {{ app.name }}
-      </p>
     </div>
-  </div>
+  </ng-container>
+  <ng-container *ngIf="!apps">
+    <div
+      class="w-100 vh-80 d-flex justify-content-center align-items-center no-select position-fixed"
+    >
+      <div class="loading-spinner"></div>
+    </div>
+  </ng-container>
 </div>
