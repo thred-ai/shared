@@ -15,7 +15,6 @@ export class HomeComponent implements OnInit {
   tapedTwice = false;
 
   clickedFly() {
-
     if (!this.tapedTwice) {
       this.tapedTwice = true;
       setTimeout(() => {
@@ -24,14 +23,14 @@ export class HomeComponent implements OnInit {
       return false;
     }
     // do something
-   this.initFly()
+    this.initFly();
 
-    return true
+    return true;
   }
 
   initFly() {
     var fly = document.getElementById('flyRing');
-    fly!.classList.remove('border');
+    this.beginFlyAnimation()
 
     let bottomBarHeight = window.innerHeight / 10;
 
@@ -39,28 +38,55 @@ export class HomeComponent implements OnInit {
       fly!.style.left = window.innerWidth / 2 - 155 / 2 + 'px';
       fly!.style.top =
         document.body.scrollHeight - 155 - bottomBarHeight + 'px';
+
+      setTimeout(() => {
+        this.endFlyAnimation()
+      }, 2000);
     }, 0);
   }
 
+  beginFlyAnimation() {
+    var fly = document.getElementById('flyRing');
+
+    var fly2 = document.getElementById('fly');
+
+    fly!.classList.remove('border');
+
+
+    fly2!.classList.remove('fly2');
+    fly2!.classList.add('fly');//
+  }
+
+  endFlyAnimation() {
+    // var fly = document.getElementById('flyRing');
+
+    var fly2 = document.getElementById('fly');
+
+    // fly!.classList.add('border');
+
+    fly2!.classList.remove('fly');
+    fly2!.classList.add('fly2');
+  }
 
   async ngOnInit() {
+    // document.addEventListener('mousemove', (e) => {
+    //   this.beginFlyAnimation()
+    //   var fly = document.getElementById('flyRing');
 
-    document.addEventListener('mousemove', function (e) {
-      var fly = document.getElementById('flyRing');
+    //   fly!.style.left = e.pageX - 77.5 + 'px';
+    //   fly!.style.top = e.pageY - 77.5 + 'px';
 
-      fly!.style.left = e.pageX - 77.5 + 'px';
-      fly!.style.top = e.pageY - 77.5 + 'px';
+    //   var cursor = document.getElementById('cursor');
+    //   cursor!.style.display = 'block';
 
-      var cursor = document.getElementById('cursor');
-      cursor!.style.display = 'block';
+    //   cursor!.style.left = e.pageX + 'px';
+    //   cursor!.style.top = e.pageY + 'px';
 
-      cursor!.style.left = e.pageX + 'px';
-      cursor!.style.top = e.pageY + 'px';
-
-      setTimeout(() => {
-        cursor!.style.display = 'none';
-      }, 1000);
-    });
+    //   setTimeout(() => {
+    //     cursor!.style.display = 'none';
+    //     this.endFlyAnimation()
+    //   }, 2000);
+    // });
 
     let signedInUser =
       (await this.loadService.currentUser)?.uid ??
