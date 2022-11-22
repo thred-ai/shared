@@ -24,9 +24,7 @@ export class HomeComponent implements OnInit {
       return false;
     }
     // do something
-    var fly = document.getElementById('fly');
-
-    fly!.classList.add("grow")
+   this.initFly()
 
     return true
   }
@@ -43,6 +41,7 @@ export class HomeComponent implements OnInit {
         document.body.scrollHeight - 155 - bottomBarHeight + 'px';
     }, 0);
   }
+
 
   async ngOnInit() {
 

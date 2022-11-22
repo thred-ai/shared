@@ -4,9 +4,9 @@
 >
   <div
     class="border border-2 border-pink rounded-circle animate__animated animate__fadeIn position-absolute"
-    style="z-index: 51;"
     (click)="clickedFly()"
     id="flyRing"
+    style="z-index: 10"
   >
     <div id="fly">
       <i></i>
@@ -19,6 +19,7 @@
     <i></i>
     <i></i>
   </div>
+
   <ng-container *ngIf="apps">
     <div
       class="w-100 row row-cols-4 justify-content-start p-2 pt-4 p-md-5 gx-0 animate__animated animate__fadeIn"
