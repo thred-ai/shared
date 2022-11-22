@@ -39,5 +39,7 @@ export class AppComponent {
     console.log(url);
 
     this.title = this.tabs.find((tab) => tab.link == url)?.name ?? '';
+
+
   }
 }

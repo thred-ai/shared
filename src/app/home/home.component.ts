@@ -12,19 +12,51 @@ import { LoadService } from '../load.service';
 export class HomeComponent implements OnInit {
   constructor(private loadService: LoadService, private root: AppComponent) {}
 
-  async ngOnInit() {
-    document.body.addEventListener('mousemove', function (e) {
-      var fly = document.getElementById('fly');
+  tapedTwice = false;
 
-      fly!.style.left = e.pageX + 'px';
-      fly!.style.top = e.pageY - 100 + 'px';
+  clickedFly() {
+
+    if (!this.tapedTwice) {
+      this.tapedTwice = true;
+      setTimeout(() => {
+        this.tapedTwice = false;
+      }, 300);
+      return false;
+    }
+    // do something
+    var fly = document.getElementById('fly');
+
+    fly!.classList.add("grow")
+
+    return true
+  }
+
+  initFly() {
+    var fly = document.getElementById('flyRing');
+    fly!.classList.remove('border');
+
+    let bottomBarHeight = window.innerHeight / 10;
+
+    setTimeout(() => {
+      fly!.style.left = window.innerWidth / 2 - 155 / 2 + 'px';
+      fly!.style.top =
+        document.body.scrollHeight - 155 - bottomBarHeight + 'px';
+    }, 0);
+  }
+
+  async ngOnInit() {
+
+    document.addEventListener('mousemove', function (e) {
+      var fly = document.getElementById('flyRing');
+
+      fly!.style.left = e.pageX - 77.5 + 'px';
+      fly!.style.top = e.pageY - 77.5 + 'px';
 
       var cursor = document.getElementById('cursor');
       cursor!.style.display = 'block';
 
-      cursor!.style.display = 'block';
       cursor!.style.left = e.pageX + 'px';
-      cursor!.style.top = e.pageY - 100 + 'px';
+      cursor!.style.top = e.pageY + 'px';
 
       setTimeout(() => {
         cursor!.style.display = 'none';
@@ -65,8 +97,11 @@ export class HomeComponent implements OnInit {
           this.loadService.getNewItems((apps) => {
             // this.loading = false;
             // this.mode = 1;
+
+            //
             setTimeout(() => {
               this.apps = apps ?? [];
+              this.initFly();
             }, 500);
           });
         } catch (error) {
