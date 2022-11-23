@@ -99,7 +99,10 @@ export class HomeComponent implements OnInit {
 
   apps?: App[];
 
-  openApp() {}
+  openApp(app: App) {
+    console.log(app);
+    (window as any)?.openApp(JSON.parse(JSON.stringify(app)))
+  }
 
   loadApps(
     user: string,
