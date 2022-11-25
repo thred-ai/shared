@@ -13,6 +13,8 @@ export const environment = {
     measurementId: 'G-4NPVBWK3NK',
   },
 
+  hashkey: "243_92_76_247_26_134_151_243_76_208_104_175_112_61_96_90_125_235_172_190_168_79_199_73_213_183_63_200_142_239_29_190",
+
   rpc: {
     '1': {
       apiKey: '6ITDh9cH13O7QaI61cL0QRvBQS-Js1km',

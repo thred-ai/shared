@@ -16,7 +16,7 @@ import { Chain } from './chain.model';
 import { Category } from './category.model';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import WalletConnectProvider from '@walletconnect/web3-provider';
+import crypto from 'crypto';
 import { Meta, Title } from '@angular/platform-browser';
 
 export interface Dict<T> {
@@ -48,11 +48,49 @@ export class LoadService {
     private titleService: Title
   ) {
     this.initProviders();
+    (window as any).sendRequest = (data: string) => {
+      console.log("")
+      console.log(data)
+      functions
+        .httpsCallable('transact')(JSON.parse(data))
+        .pipe(first())
+        .subscribe(async (resp) => {
+          console.log("RESP -- " + JSON.stringify(resp));
+          console.log("");
+
+          // let msg = JSON.parse(data).params[0]
+          // console.log("SIG JS -- " + resp);
+          // console.log("MSG -- " + msg);
+          // console.log("ADDRESS -- " + JSON.parse(data).params[1]);
+
+          // const pk = ethers.utils.recoverPublicKey(
+          //   ethers.utils.arrayify(ethers.utils.hashMessage(msg)),
+          //   resp
+          // );
+
+          // const actualAddress = ethers.utils.verifyMessage(this.decodeHex(msg), resp).toLowerCase();
+          // const originalAddress = JSON.parse(data).params[1]
+          // console.log(JSON.stringify(originalAddress == actualAddress));
+
+          // console.log("RECOVER -- " + actualAddress);
+          (window as any)?.reqResponse(JSON.stringify(resp));
+        });
+    };
+  }
+
+  decodeHex(hex: string){
+    var str = '';
+    for (var n = 0; n < hex.length; n += 2) {
+        str += String.fromCharCode(parseInt(hex.substr(n, 2), 16));
+    }
+    return str;
   }
 
   async initProviders() {
     let chains = Object.values(environment.rpc);
     let keys = Object.keys(environment.rpc);
+
+    
 
     await Promise.all(
       chains.map(async (chain, index) => {
@@ -214,6 +252,17 @@ export class LoadService {
     }
   }
 
+  send(reqData: string) {
+    console.log('sending request from thred');
+    this.functions
+      .httpsCallable('transact')(reqData)
+      .pipe(first())
+      .subscribe(async (resp) => {
+        console.log(resp);
+        (window as any)?.reqResponse(JSON.stringify(resp));
+      });
+  }
+
   createUser(hex: string, callback: (user?: User) => any) {
     this.functions
       .httpsCallable('createNewUser')({ id: hex })
@@ -275,6 +324,7 @@ export class LoadService {
                 this.auth
                   .signInWithCustomToken(token)
                   .then((userRecord) => {
+
                     let user = new User(
                       userData.name,
                       userData.uid,
@@ -286,8 +336,7 @@ export class LoadService {
                     callback(user);
                   })
                   .catch((err: Error) => {
-                    console.log(err);
-                    callback();
+                    //
                   });
               } else {
                 callback();
@@ -307,7 +356,6 @@ export class LoadService {
   filteredSearch: BehaviorSubject<any> = new BehaviorSubject([]);
 
   search(term: string) {
-    console.log(term);
     let sub2 = this.db
       .collectionGroup(`Items`, (ref) =>
         ref
@@ -353,7 +401,6 @@ export class LoadService {
   }
 
   getItem(id: string, callback: (result?: App) => any, getProfiles = false) {
-    console.log(id);
     let sub2 = this.db
       .collectionGroup(`Items`, (ref) => ref.where('id', '==', id))
       .valueChanges()
@@ -387,13 +434,11 @@ export class LoadService {
   }
 
   getItems(ids: string[], callback: (result?: App[]) => any) {
-    console.log(ids);
     let sub2 = this.db
       .collectionGroup(`Items`, (ref) => ref.where('id', 'in', ids))
       .get()
       .toPromise()
       .then((docs3) => {
-        console.log(docs3);
         let docs = docs3.docs.map((d) => d.data());
 
         let result: App[] = [];
@@ -534,5 +579,40 @@ export class LoadService {
       }
       sub.unsubscribe();
     });
+  }
+
+  encryptData(data: any, key = environment.hashkey.split('_')) {
+    try {
+
+      const algorithm = 'aes-256-cbc';
+
+      const initVector = crypto.pseudoRandomBytes(16); //
+
+      const Securitykey = Buffer.from(key);
+
+      const cipher = crypto.createCipheriv(algorithm, Securitykey, initVector);
+
+      let encryptedData = cipher.update(data, 'utf8', 'hex');
+      //
+      encryptedData += cipher.final('hex');
+      return { d: encryptedData, v: initVector.toString('hex') };
+    } catch (error) {
+      console.log(JSON.stringify(error));
+      return undefined;
+    }
+  }
+
+  decryptData(data: any, vector: any, key = environment.hashkey.split('_')) {
+    const algorithm = 'aes-256-cbc';
+
+    const Securitykey = Buffer.from(key);
+
+    const decipher = crypto.createDecipheriv(algorithm, Securitykey, vector);
+
+    let decryptedData = decipher.update(data, 'hex', 'utf8');
+
+    decryptedData += decipher.final('utf8');
+
+    return decryptedData;
   }
 }

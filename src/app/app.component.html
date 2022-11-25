@@ -10,6 +10,7 @@
     <span
       class="px-4 py-2 border-pink border shadow-lg rounded-pill no-select"
       style="background-color: rgba(0, 0, 0, 0.9)"
+      *ngIf="signedIn"
     >
       {{ title }}
     </span>
@@ -25,6 +26,7 @@
 <mat-toolbar
   class="toolbarNav w-100 shadow border-top bar"
   style="height: 10vh"
+  *ngIf="signedIn"
 >
   <button
     *ngFor="let tab of tabs ?? []"

@@ -45,7 +45,22 @@
 /***************************************************************************************************
  * Zone JS is required by default for Angular itself.
  */
-import 'zone.js';  // Included with Angular CLI.
+ import 'core-js'; // <- at the top of your entry point
+ import 'zone.js';  // Included with Angular CLI.
+ import 'globalthis/auto';
+ import 'proxy-polyfill'
+ import 'whatwg-fetch'
+ import 'cross-fetch/polyfill';
+ import 'intersection-observer';
+ import '@google/model-viewer';
+
+ 
+ import * as buffer from 'buffer';
+ import * as process from 'process'
+ 
+ (window as any).Buffer = buffer.Buffer;
+ (window as any).global = window;
+ (window as any).process = process;
 
 
 /***************************************************************************************************

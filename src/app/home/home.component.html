@@ -1,8 +1,8 @@
 <div
-  class="w-100 d-flex justify-content-center flex-column align-items-center no-select"
+  class="w-100 d-flex justify-content-center flex-column align-items-center no-select animate__animated animate__fadeIn"
   style="min-height: 57.5vh; padding-bottom: 150px"
 >
-  <div
+  <!-- <div
     class="border border-2 border-pink rounded-circle animate__animated animate__fadeIn position-absolute"
     (click)="clickedFly()"
     id="flyRing"
@@ -18,7 +18,9 @@
   <div id="cursor">
     <i></i>
     <i></i>
-  </div>
+  </div> -->
+
+  <app-butterfly></app-butterfly>
 
   <ng-container *ngIf="apps">
     <div

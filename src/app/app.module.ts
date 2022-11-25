@@ -69,13 +69,17 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { HomeComponent } from './home/home.component';
 import { AccountComponent } from './account/account.component';
 import { StoreComponent } from './store/store.component';
+import { AuthComponent } from './auth/auth.component';
+import { ButterflyComponent } from './butterfly/butterfly.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
     AccountComponent,
-    StoreComponent
+    StoreComponent,
+    AuthComponent,
+    ButterflyComponent
   ],
   imports: [
     CommonModule,

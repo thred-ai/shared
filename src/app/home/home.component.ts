@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ethers } from 'ethers';
 import { AppComponent } from '../app.component';
 import { App } from '../app.model';
+import { ButterflyComponent } from '../butterfly/butterfly.component';
 import { LoadService } from '../load.service';
 
 @Component({
@@ -12,61 +13,9 @@ import { LoadService } from '../load.service';
 export class HomeComponent implements OnInit {
   constructor(private loadService: LoadService, private root: AppComponent) {}
 
-  tapedTwice = false;
+  @ViewChild(ButterflyComponent) butterfly?: ButterflyComponent;
 
-  clickedFly() {
-    if (!this.tapedTwice) {
-      this.tapedTwice = true;
-      setTimeout(() => {
-        this.tapedTwice = false;
-      }, 300);
-      return false;
-    }
-    // do something
-    this.initFly();
-
-    return true;
-  }
-
-  initFly() {
-    var fly = document.getElementById('flyRing');
-    this.beginFlyAnimation()
-
-    let bottomBarHeight = window.innerHeight / 10;
-
-    setTimeout(() => {
-      fly!.style.left = window.innerWidth / 2 - 155 / 2 + 'px';
-      fly!.style.top =
-        document.body.scrollHeight - 155 - bottomBarHeight + 'px';
-
-      setTimeout(() => {
-        this.endFlyAnimation()
-      }, 2000);
-    }, 0);
-  }
-
-  beginFlyAnimation() {
-    var fly = document.getElementById('flyRing');
-
-    var fly2 = document.getElementById('fly');
-
-    fly!.classList.remove('border');
-
-
-    fly2!.classList.remove('fly2');
-    fly2!.classList.add('fly');//
-  }
-
-  endFlyAnimation() {
-    // var fly = document.getElementById('flyRing');
-
-    var fly2 = document.getElementById('fly');
-
-    // fly!.classList.add('border');
-
-    fly2!.classList.remove('fly');
-    fly2!.classList.add('fly2');
-  }
+  
 
   async ngOnInit() {
     // document.addEventListener('mousemove', (e) => {
@@ -88,12 +37,18 @@ export class HomeComponent implements OnInit {
     //   }, 2000);
     // });
 
+    
+
     let signedInUser =
-      (await this.loadService.currentUser)?.uid ??
-      '0xd31c54eFD3A4B5E6a993AaA4618D3700a12ff752';
+      (await this.loadService.currentUser)?.uid;
     if (signedInUser) {
       await this.loadService.initProviders();
-      this.loadApps(signedInUser);
+
+      if ((window as any).newInstance ?? false){
+        this.butterfly?.beginFlyAnimation()
+      }
+
+      this.loadApps(signedInUser);//
     }
   }
 
@@ -110,6 +65,7 @@ export class HomeComponent implements OnInit {
     provider = this.loadService.providers[chainId].ethers
   ) {
     // this.loading = true;
+
     this.loadService.getCoreABI(chainId, async (result) => {
       if (result) {
         let abi = result.abi;
@@ -127,9 +83,10 @@ export class HomeComponent implements OnInit {
             // this.mode = 1;
 
             //
+
             setTimeout(() => {
               this.apps = apps ?? [];
-              this.initFly();
+              this.butterfly?.initFly()
             }, 500);
           });
         } catch (error) {
