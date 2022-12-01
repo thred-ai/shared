@@ -15,16 +15,16 @@ export class AppComponent {
   signedIn?: Boolean;
 
   tabs = [
-    {
-      name: 'Discover',
-      icon: 'search',
-      link: '/store',
-    },
-    {
-      name: 'My Apps',
-      icon: 'apps',
-      link: '/home',
-    },
+    // {
+    //   name: 'Discover',
+    //   icon: 'search',
+    //   link: '/store',
+    // },
+    // {
+    //   name: 'My Apps',
+    //   icon: 'apps',
+    //   link: '/home',
+    // },
     {
       name: 'Account',
       icon: 'account_balance_wallet',
