@@ -15,6 +15,7 @@ export class StoreComponent implements OnInit {
   provider?: ethers.providers.Web3Provider;
   loading = 0
   installingId = ""
+  address: string = ""
 
   constructor(private root: AppComponent, private loadService: LoadService) {
     console.log('HEY');
@@ -26,7 +27,7 @@ export class StoreComponent implements OnInit {
     if (signedInUser) {
       await this.loadService.initProviders();
       this.provider = await this.loadService.initializeProvider();
-
+      this.address = await this.provider?.getSigner().getAddress() ?? "";
       this.loadApps(signedInUser, 5, undefined, (success) => {
         this.loadService.getNewItems((apps) => {
           this.apps = apps;
@@ -38,6 +39,15 @@ export class StoreComponent implements OnInit {
 
   installed(app: App) {
     return this.installedApps.find((a) => a == app.id) != undefined;
+  }
+
+  listed(app: App){
+    let util = app.signatures.find((s) => s.chainId == 5);
+
+    if (util?.listed || app.whitelist?.find((a) => a == this.address)) {
+      return true
+    }
+    return false
   }
 
   async install(app: App, chainId = 5, provider = this.provider) {

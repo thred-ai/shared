@@ -3,51 +3,64 @@
   style="min-height: 67.5vh; padding-bottom: 150px"
 >
   <div class="w-100 p-2" *ngIf="apps">
-    <div class="w-100 py-1" *ngFor="let app of apps" role="button" (click)="openApp(app)">
+    <div
+      class="w-100 py-1"
+      *ngFor="let app of apps"
+      role="button"
+      (click)="openApp(app)"
+    >
       <div
         class="w-100 p-2 pe-3 body d-flex justify-content-between align-content-center rounded-15"
       >
-      <div class="w-100 d-flex justify-content-start align-content-center">
-        <div
-        class="rounded-15 border d-flex justify-content-center align-content-center shadow"
-        style="aspect-ratio: 1; width: 65px; overflow: hidden"
-      >
-        <div
-          class="m-auto position-relative rounded-15"
-          style="height: 100%; width: 100%; overflow: hidden"
-          role="button"
-        >
-          <img
-            class="w-100 h-100"
-            style="object-fit: cover"
-            [src]="app.displayUrls[0] | safeUrl"
-          />
+        <div class="w-100 d-flex justify-content-start align-content-center">
+          <div
+            class="rounded-15 border d-flex justify-content-center align-content-center shadow"
+            style="aspect-ratio: 1; width: 65px; overflow: hidden"
+          >
+            <div
+              class="m-auto position-relative rounded-15"
+              style="height: 100%; width: 100%; overflow: hidden"
+              role="button"
+            >
+              <img
+                class="w-100 h-100"
+                style="object-fit: cover"
+                [src]="app.displayUrls[0] | safeUrl"
+              />
+            </div>
+          </div>
+          <div class="my-auto ms-3 w-50">
+            <div class="text-white fw-bold">
+              {{ app.name }}
+            </div>
+            <div class="text-pink w-100 text-truncate" style="font-size: small">
+              {{ app.creatorName ?? app.description }}
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="my-auto ms-3 w-50">
-          <div class="text-white fw-bold">
-              {{app.name}}
-          </div>
-          <div class="text-pink w-100 text-truncate" style="font-size: small;">
-              {{app.creatorName ?? app.description}}
-          </div>
-      </div>
-      </div>
-      <div class="py-2 px-3 fw-bold text-white rounded rounded-pill bar border border-pink my-auto" style="font-size: small;" (click)="install(app)">
-        {{
-            loading == 0 || installingId !== app.id
-              ? installed(app) ? "Launch" : "Install"
-              : loading == 1
-              ? "Verifying"
-              : loading == 2
-              ? "Installing"
-              : loading == 3
-              ? "Installed"
-              : loading == 4
-              ? "Install Failed"
-              : "Not Available"            
-            }}
-      </div>
+        <div
+          class="py-2 px-3 fw-bold text-white rounded rounded-pill bar border border-pink my-auto"
+          style="font-size: small"
+          (click)="install(app)"
+        >
+          {{
+            listed(app)
+              ? loading == 0 || installingId !== app.id
+                ? installed(app)
+                  ? "Launch"
+                  : "Install"
+                : loading == 1
+                ? "Verifying"
+                : loading == 2
+                ? "Installing"
+                : loading == 3
+                ? "Installed"
+                : loading == 4
+                ? "Install Failed"
+                : "Not Available"
+              : "Inactive"
+          }}
+        </div>
       </div>
     </div>
   </div>
