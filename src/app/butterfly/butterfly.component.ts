@@ -13,6 +13,7 @@ export class ButterflyComponent implements OnInit {
   }
 
   tapedTwice = false; //
+  @Input() movable = false
 
 
   clickedFly() {
@@ -33,13 +34,16 @@ export class ButterflyComponent implements OnInit {
     var fly = document.getElementById('flyRing');
     this.beginFlyAnimation(hideRing)
 
-    let bottomBarHeight = window.innerHeight / 10;
 
     setTimeout(() => {
-      fly!.style.left = window.innerWidth / 2 - 155 / 2 + 'px';
-      fly!.style.top =
-        document.body.scrollHeight - 75 - bottomBarHeight + 'px';
+      if (this.movable){
+        let bottomBarHeight = (window.innerHeight / 10) * 2;
 
+        fly!.style.left = window.innerWidth / 2 - 155 / 2 + 'px';
+        fly!.style.top =
+          document.body.scrollHeight - 75 - bottomBarHeight + 'px';
+  
+      }
       setTimeout(() => {
         this.endFlyAnimation()
       }, 1500);

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ethers } from 'ethers';
 import { AppComponent } from '../app.component';
 import { App } from '../app.model';
@@ -11,9 +11,10 @@ import { LoadService } from '../load.service';
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit {
-  constructor(private loadService: LoadService, private root: AppComponent) {}
+  constructor(private loadService: LoadService, private root: AppComponent, private cdr: ChangeDetectorRef) {
+    root.initApp()
+  }
 
-  @ViewChild(ButterflyComponent) butterfly?: ButterflyComponent;
 
   
 
@@ -44,9 +45,6 @@ export class HomeComponent implements OnInit {
     if (signedInUser) {
       await this.loadService.initProviders();
 
-      if ((window as any).newInstance ?? false){
-        this.butterfly?.beginFlyAnimation()
-      }
 
       this.loadApps(signedInUser);//
     }
@@ -55,13 +53,12 @@ export class HomeComponent implements OnInit {
   apps?: App[];
 
   openApp(app: App) {
-    console.log(app);
     (window as any)?.openApp(JSON.parse(JSON.stringify(app)))
   }
 
   loadApps(
     user: string,
-    chainId = 137,
+    chainId = 5,
     provider = this.loadService.providers[chainId].ethers
   ) {
     // this.loading = true;
@@ -78,15 +75,17 @@ export class HomeComponent implements OnInit {
 
           let filtered = [...new Set(data.filter((d) => d != ''))];
 
-          this.loadService.getNewItems((apps) => {
+          this.loadService.getItems(filtered, (apps) => {
             // this.loading = false;
             // this.mode = 1;
 
             //
+            console.log("oy")
 
             setTimeout(() => {
               this.apps = apps ?? [];
-              this.butterfly?.initFly()
+              this.cdr.detectChanges()
+              this.root.butterfly?.initFly()
             }, 500);
           });
         } catch (error) {

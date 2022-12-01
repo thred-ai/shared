@@ -71,15 +71,36 @@ import { AccountComponent } from './account/account.component';
 import { StoreComponent } from './store/store.component';
 import { AuthComponent } from './auth/auth.component';
 import { ButterflyComponent } from './butterfly/butterfly.component';
+import { AddressEnsLookupPipe } from './address-ens-lookup.pipe';
+import { AddressPipe } from './address.pipe';
+import { AddressValidatePipe } from './address-validate.pipe';
+import { FormatEtherPipe } from './format-ether.pipe';
+import { NameEnsLookupPipe } from './name-ens-lookup.pipe';
+import { TypeNumberPipe } from './type-number.pipe';
+import { IsLocationPipe } from './is-location.pipe';
+import { ProfileComponent } from './profile/profile.component';
+import { SafeUrlPipe } from './safe-url.pipe';
+import {ClipboardModule} from '@angular/cdk/clipboard';
+import { ItemComponent } from './item/item.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
     AccountComponent,
+    ItemComponent,
     StoreComponent,
     AuthComponent,
-    ButterflyComponent
+    ButterflyComponent,
+    ProfileComponent,
+    AddressEnsLookupPipe,
+    AddressPipe,
+    AddressValidatePipe,
+    FormatEtherPipe,
+    NameEnsLookupPipe,
+    TypeNumberPipe,
+    IsLocationPipe,
+    SafeUrlPipe
   ],
   imports: [
     CommonModule,
@@ -88,6 +109,7 @@ import { ButterflyComponent } from './butterfly/butterfly.component';
     AppRoutingModule,
     MatTooltipModule,
     BrowserAnimationsModule,
+    ClipboardModule,
     MatToolbarModule,
     MatIconModule,
     AngularFireModule.initializeApp(environment.firebase),
@@ -98,6 +120,7 @@ import { ButterflyComponent } from './butterfly/butterfly.component';
     MatSnackBarModule,
     DragScrollModule,
     MatDialogModule,
+    MatSnackBarModule,
     InViewportModule,
     HttpClientModule,
     FormsModule,

@@ -1,0 +1,101 @@
+<div
+  class="w-100 d-flex justify-content-start flex-column align-items-center no-select animate__animated animate__slideInUp animate__faster"
+  style="min-height: 57.5vh; padding-bottom: 0px"
+>
+  <form class="mt-3 px-0 w-100" [formGroup]="profileForm">
+    <div class="wrap-input1 w-100 pt-3 px-4">
+      <span style="font-size: small" class="w-100 text-start text-pink"
+        >Display Image</span
+      >
+
+      <div
+        class="rounded-15 border d-flex justify-content-center align-content-center shadow mb-2 mt-2"
+        style="aspect-ratio: 1; width: 75px; overflow: hidden"
+      >
+        <div
+          class="m-auto position-relative rounded-15"
+          style="height: 95%; width: 95%; overflow: hidden"
+          role="button"
+          (click)="appImgInput.click()"
+        >
+          <img
+            class="w-100 h-100"
+            style="object-fit: cover"
+            [src]="profileForm.controls['url'].value.url | safeUrl"
+          />
+       
+          <input
+            #appImgInput
+            type="file"
+            (change)="fileChangeEvent($event)"
+            style="display: none"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="wrap-input1 w-100 pt-3 px-4 px-md-5 text-pink">
+      <span style="font-size: small" class="w-100 text-start"
+        >Display Name</span
+      >
+      <div class="rounded-15 border w-100 pb-2 px-4 mb-2 mt-2">
+        <mat-form-field
+          class="w-100 text-white"
+          appearance="legacy"
+          floatLabel="never"
+        >
+          <input
+            matInput
+            class="bg-transparent text-truncate text-white"
+            type="text"
+            name="name"
+            formControlName="name"
+            placeholder="Display Name"
+          />
+          <!-- <span class="shadow-input1 py-3 px-2 px-lg-4 px-md-4"></span> -->
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="wrap-input1 w-100 pt-3 px-4 px-md-5">
+      <span style="font-size: small" class="w-100 text-start text-pink"
+        >Email</span
+      >
+      <div class="rounded-15 border w-100 pb-2 px-4 mb-2 mt-2">
+        <mat-form-field
+          class="w-100 text-white"
+          appearance="legacy"
+          floatLabel="never"
+        >
+          <input
+            matInput
+            class="bg-transparent text-truncate text-white"
+            type="email"
+            name="email"
+            formControlName="email"
+            placeholder="Email Address"
+          />
+          <!-- <span class="shadow-input1 py-3 px-2 px-lg-4 px-md-4"></span> -->
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="wrap-input1 w-100 pt-0 px-4 mt-4">
+      <div class="w-100 py-1 mt-3">
+        <button
+          class="btn bg-purple rounded-15 text-white px-5 py-3 fw-bold w-100 mt-1"
+          (click)="save()"
+          id="continue"
+        >
+          Continue
+          <span
+            *ngIf="loading"
+            class="spinner-border spinner-border-sm ms-1"
+            role="status"
+            aria-hidden="true"
+          ></span>
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

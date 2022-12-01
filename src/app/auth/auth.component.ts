@@ -165,10 +165,9 @@ export class AuthComponent implements OnInit, OnDestroy {
       console.log(hex)
 
       this.loadService.finishSignUp(hex, (result) => {
-        (window as any).thred = hex;
         (window as any).newInstance = true;
         (window as any).registerKey(hex)
-        this.root.routetoHome()
+        this.root.routeToProfile()
         callback(result);
       });
     }
@@ -193,10 +192,10 @@ export class AuthComponent implements OnInit, OnDestroy {
       console.log(hex)
   
       this.loadService.finishSignIn(hex, (result) => {
-        (window as any).thred = hex;
+        console.log(hex);
         (window as any).newInstance = true;
         (window as any).registerKey(hex)
-        this.root.routetoHome()
+        this.root.routeToProfile()
         callback(result);
       });
     }//
@@ -213,10 +212,11 @@ export class AuthComponent implements OnInit, OnDestroy {
     window.onclick = null;
   }
 
-  ngOnInit(): void {
+  async ngOnInit() {
 
-      let hex = (window as any)?.thred
+      let hex = await (window as any)?.thred() as string
 
+      console.log("HEX -- " + hex)
 
     if (hex){
       console.log(`INJECTED HEX: ${hex}`)
@@ -224,9 +224,8 @@ export class AuthComponent implements OnInit, OnDestroy {
       this.butterfly?.addRing()
       this.loadService.finishSignIn(hex, (result) => {
         (window as any).newInstance = true;
-
         (window as any).registerKey(hex)
-        this.root.routetoHome()
+        this.root.routeToProfile()
       });
     }
     else{

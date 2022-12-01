@@ -1,5 +1,5 @@
 <div
-  class="w-100 d-flex justify-content-center flex-column align-items-center no-select animate__animated animate__fadeIn"
+  class="w-100 d-flex justify-content-start flex-column align-items-center no-select animate__animated animate__fadeIn"
   style="min-height: 57.5vh; padding-bottom: 150px"
 >
   <!-- <div
@@ -20,11 +20,10 @@
     <i></i>
   </div> -->
 
-  <app-butterfly></app-butterfly>
-
   <ng-container *ngIf="apps">
     <div
-      class="w-100 row row-cols-4 justify-content-start p-2 pt-4 p-md-5 gx-0 animate__animated animate__fadeIn"
+      class="w-100 row row-cols-4 justify-content-start p-2 p-md-5 gx-0 animate__animated animate__fadeIn"
+      *ngIf="apps.length > 0"
     >
       <div
         class="col text-center p-2-5 pt-0 pb-0 p-md-4 px-md-5 no-select"
@@ -56,6 +55,7 @@
         </p>
       </div>
     </div>
+
   </ng-container>
   <!-- <ng-container *ngIf="!apps">
     <div

@@ -15,6 +15,9 @@
       {{ title }}
     </span>
   </div>
+
+  <app-butterfly *ngIf="!isLocation(['/auth', '/edit', '/store/'])" [movable]="true"></app-butterfly>
+
   <router-outlet></router-outlet>
   <!-- (activate)="onActivate($event)"
   [ngRouterOutletComm]="{

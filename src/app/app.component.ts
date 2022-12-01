@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { initializeApp } from '@angular/fire/app';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ethers } from 'ethers';
+import { ButterflyComponent } from './butterfly/butterfly.component';
 import { LoadService } from './load.service';
 
 @Component({
@@ -39,61 +40,57 @@ export class AppComponent {
 
   toHex(str: string) {
     var result = '';
-    for (var i=0; i<str.length; i++) {
+    for (var i = 0; i < str.length; i++) {
       result += str.charCodeAt(i).toString(16);
     }
     return result;
   }
 
+  @ViewChild(ButterflyComponent) butterfly?: ButterflyComponent;
+
   async ngOnInit() {
-    this.initApp()
+    document.body.classList.add('bar');
 
-    const message = 'Welcome to Thred! \n\nPlease sign this message!';
-
-    // In frontend
-    setTimeout(async () => {
-      const provider = new ethers.providers.Web3Provider(
-        (window as any).ethereum
-      );
-      await provider.send('eth_requestAccounts', []); // connects MetaMask
-      const signer = provider.getSigner()
-      console.log('SIGNER -- ' + await signer.getAddress());
-
-      console.log("HASHED -- " + this.toHex(message))
-      // console.log(JSON.stringify(provider))
-
-      try {
-        const signature = await signer.signMessage(message);
-
-        console.log("SIG CL -- " + signature)
-        const recoveredAddress = ethers.utils.verifyMessage(this.loadService.decodeHex(this.toHex(message)), signature);
-  
-        console.log(recoveredAddress)
-        // console.log((JSON.stringify(recoveredAddress === await signer.getAddress())))
-      } catch (error) {
-        console.log("Failed")
-        console.log(JSON.stringify(error))
-      }//
-    }, 1000);
-
-    
+    if ((window as any).newInstance ?? false) {
+      this.butterfly?.beginFlyAnimation();
+    }
   }
 
   async initApp() {
-    document.body.classList.add('bar');
+    console.log("INITING")
+    console.log(JSON.stringify(this.signedIn ?? false));
+
     let url =
       window.location.pathname == '/' ? '/home' : window.location.pathname;
     console.log(url);
 
-    this.title = this.tabs.find((tab) => tab.link == url)?.name ?? '';
-    this.signedIn = (await this.loadService.currentUser)?.uid != undefined
+    this.title = this.tabs.find((tab) => tab.link == url)?.name ?? 'App';
+    this.signedIn = (await this.loadService.currentUser)?.uid != undefined;
+  }
+
+  isLocation(locations: string[]) {
+    return (
+      locations.find((loc) => loc == window.location.pathname || window.location.pathname.includes(`${loc}`)) != undefined
+    );
   }
 
   routeToAuth() {
     this._router.navigateByUrl('/auth');
   }
 
+  routeToEdit() {
+    this._router.navigateByUrl('/edit');
+  }
+
   routetoHome() {
     this._router.navigateByUrl('/home');
+  }
+
+  routeToProfile() {
+    this._router.navigateByUrl('/account'); //
+  }
+
+  routeToItem(id: string) {
+    this._router.navigateByUrl(`/store/${id}`); //
   }
 }

@@ -8000,7 +8000,7 @@ mat-sidenav {
 }
 
 .text-pink {
-  color: #ceb597 !important;
+  color: rgb(170, 117, 221) !important;
 }
 
 .text-blue {
@@ -8072,7 +8072,7 @@ mat-sidenav {
 }
 
 .bg-pink {
-  background-color: rgb(255, 232, 248) !important;
+  background-color: rgb(170, 117, 221) !important;
 }
 
 .bg-blue {
@@ -12031,8 +12031,11 @@ mat-calendar.no-header {
 
 .mat-tab-group.mat-primary .mat-ink-bar,
 .mat-tab-nav-bar.mat-primary .mat-ink-bar {
-  background-color: #761de3;
+  background-color: white;
+  color: white !important;
 }
+
+
 
 .big-design-notif-title {
   font-size: 1rem;

@@ -1,0 +1,93 @@
+.notif-icon {
+    transition: transform 0.25s ease-in-out;
+  }
+  
+  .notif-icon:hover {
+    transform: rotate(180deg) scale(1.2, 1.2);
+  }
+  
+  .success-hover:hover {
+    background-color: #01df5d !important;
+  }
+  
+  .danger-hover:hover {
+    background-color: #dc3545 !important;
+  }
+  
+  ::ng-deep .mat-option .mat-pseudo-checkbox {
+    display: none;
+  }
+  
+  ::ng-deep .mat-form-field-underline {
+    display: none;
+  }
+  
+  .img-input {
+    overflow: hidden;
+    .img-input-display {
+      display: none;
+    }
+    img {
+      display: block;
+    }
+    mat-icon {
+      display: none;
+    }
+  }
+  
+  .m-img-input {
+    overflow: hidden;
+    .m-img-input-display {
+      opacity: 1;
+    }
+    mat-icon {
+      display: none;
+    }
+  }
+  
+  
+  .nft-img {
+    width: 47.5px;
+    height: 47.5px;
+    object-fit: cover;
+  }
+  
+  :host ::ng-deep .mat-form-field-wrapper {
+    margin: 0 !important;
+    padding: 0;
+  }
+  
+  .rounded-panel.mat-select-panel {
+    border-radius: 15px !important;
+  }
+  
+  .truncate {
+    /**Major Properties**/
+    overflow: hidden;
+    line-height: 2rem;
+    max-height: 8rem;
+    -webkit-box-orient: vertical;
+    display: block;
+    display: -webkit-box;
+    overflow: hidden !important;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 4;
+  }
+  
+  .rounded-10 {
+    border-radius: 10px;
+  }
+  ::ng-deep .mat-form-field-underline {
+    display: none;
+  }
+  
+  :host ::ng-deep .mat-form-field-wrapper {
+    margin: 0 !important;
+    color: white;
+
+    padding: 0;
+  }
+
+  ::ng-deep .mat-form-field-label{
+    color: rgb(249, 191, 249) !important;
+}
