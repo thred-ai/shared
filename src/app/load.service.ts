@@ -760,13 +760,11 @@ window.ethereum = {
     networkVersion: "137",
 
     isMetaMask:true,
-    isBraveWallet:true,
 
     selectedAddress:null,
 
     enable: async function(){
         var data = {method: "eth_accounts", params: [], chainId: window.ethereum.networkVersion}
-        console.log("CONNECTING")
         let returnData = JSON.parse(await ${requestMethod})
         window.ethereum.selectedAddress = returnData[0];
         return Promise.resolve(str);
