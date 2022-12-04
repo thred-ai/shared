@@ -80,7 +80,6 @@ export class HomeComponent implements OnInit {
             // this.mode = 1;
 
             //
-            console.log("oy")
 
             setTimeout(() => {
               this.apps = apps ?? [];

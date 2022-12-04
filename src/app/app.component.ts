@@ -57,12 +57,10 @@ export class AppComponent {
   }
 
   async initApp() {
-    console.log("INITING")
-    console.log(JSON.stringify(this.signedIn ?? false));
+
 
     let url =
       window.location.pathname == '/' ? '/home' : window.location.pathname;
-    console.log(url);
 
     this.title = this.tabs.find((tab) => tab.link == url)?.name ?? 'App';
     this.signedIn = (await this.loadService.currentUser)?.uid != undefined;

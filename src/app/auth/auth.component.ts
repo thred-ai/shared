@@ -20,7 +20,7 @@ import { LoadService } from '../load.service';
 export class AuthComponent implements OnInit, OnDestroy {
   mode = 3;
   loading = false;
-  isAuth = true
+  isAuth = true;
 
   err?: string;
 
@@ -40,7 +40,6 @@ export class AuthComponent implements OnInit, OnDestroy {
   });
 
   @ViewChild(ButterflyComponent) butterfly?: ButterflyComponent;
-
 
   constructor(
     private fb: FormBuilder,
@@ -155,23 +154,23 @@ export class AuthComponent implements OnInit, OnDestroy {
     let email = form.controls['email'].value;
     let pass = form.controls['password'].value;
 
-    let data = this.loadService.encryptData(`$${JSON.stringify({email, pass})}$`)
+    let data = this.loadService.encryptData(
+      `$${JSON.stringify({ email, pass })}$`
+    );
 
-    if (data){
-      let d = data.d
-      let v = data.v
+    if (data) {
+      let d = data.d;
+      let v = data.v;
 
-      let hex = `${v}.${d}`
-      console.log(hex)
+      let hex = `${v}.${d}`;
 
       this.loadService.finishSignUp(hex, (result) => {
         (window as any).newInstance = true;
-        (window as any).registerKey(hex)
-        this.root.routeToProfile()
+        (window as any).registerKey(hex);
+        this.root.routeToProfile();
         callback(result);
       });
     }
-
   }
 
   private handleSignIn(
@@ -181,24 +180,23 @@ export class AuthComponent implements OnInit, OnDestroy {
     let email = form.controls['email'].value;
     let pass = form.controls['password'].value;
 
-    let data = this.loadService.encryptData(`$${JSON.stringify({email, pass})}$`)
-//
-    if (data){
-      let d = data.d
-      let v = data.v
+    let data = this.loadService.encryptData(
+      `$${JSON.stringify({ email, pass })}$`
+    );
+    //
+    if (data) {
+      let d = data.d;
+      let v = data.v;
 
-      let hex = `${v}.${d}`
+      let hex = `${v}.${d}`;
 
-      console.log(hex)
-  
       this.loadService.finishSignIn(hex, (result) => {
-        console.log(hex);
         (window as any).newInstance = true;
-        (window as any).registerKey(hex)
-        this.root.routeToProfile()
+        (window as any).registerKey(hex);
+        this.root.routeToProfile();
         callback(result);
       });
-    }//
+    } //
   }
 
   private handlePassReset(
@@ -213,25 +211,20 @@ export class AuthComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
+    let hex = (await (window as any)?.thred()) as string;
 
-      let hex = await (window as any)?.thred() as string
-
-      console.log("HEX -- " + hex)
-
-    if (hex){
-      console.log(`INJECTED HEX: ${hex}`)
-      this.mode = 3
-      this.butterfly?.addRing()
+    if (hex) {
+      this.mode = 3;
+      this.butterfly?.addRing();
       this.loadService.finishSignIn(hex, (result) => {
         (window as any).newInstance = true;
-        (window as any).registerKey(hex)
-        this.root.routeToProfile()
+        (window as any).registerKey(hex);
+        this.root.routeToProfile();
       });
+    } else {
+      this.mode = 0;
     }
-    else{
-     this.mode = 0
-    }
-//
+    //
     window.onclick = (e) => {
       if (isPlatformBrowser(this.platformID)) {
         if ((e.target as any).id != 'continue') {

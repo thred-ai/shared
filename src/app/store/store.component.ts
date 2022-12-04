@@ -18,7 +18,6 @@ export class StoreComponent implements OnInit {
   address: string = ""
 
   constructor(private root: AppComponent, private loadService: LoadService) {
-    console.log('HEY');
     root.initApp();
   }
 
@@ -69,8 +68,6 @@ export class StoreComponent implements OnInit {
     let walletAddress = await signer.getAddress();
 
     let util = app.signatures.find((s) => s.chainId == chainId);
-
-    console.log(util);
 
     this.installingId = app.id
     this.loading = 2

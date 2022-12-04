@@ -66,7 +66,7 @@
                   [src]="chain.chain.url"
                 />
                 <span class="text-white h4 fw-bold px-1">
-                  {{ chain.balance | formatEther }}
+                  {{ chain.balance | formatEther: 2 }}
                   {{ chain.chain.currency }}</span
                 >
                 <span

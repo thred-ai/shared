@@ -6,8 +6,8 @@ import { ethers } from 'ethers';
 })
 export class FormatEtherPipe implements PipeTransform {
 
-  transform(value: ethers.BigNumber) {
-    return ethers.utils.formatEther(value);
+  transform(value: ethers.BigNumber, decimal: number = 4) {
+    return Number(ethers.utils.formatEther(value)).toFixed(decimal);
   }
 
 }

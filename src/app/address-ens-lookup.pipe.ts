@@ -14,7 +14,6 @@ export class AddressEnsLookupPipe implements PipeTransform {
   transform(value: string) {
     if (isPlatformBrowser(this.platformID)) {
       try {
-        console.log(value)
         return this.loadService.providers['1']?.ethers.lookupAddress(value);
       } catch (error) {
         console.log(error);

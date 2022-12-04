@@ -73,7 +73,7 @@ export class ItemComponent implements OnInit, OnDestroy {
       (result) => {
         this.item = result;
         if (result) {
-          console.log(result)
+          
         }
       },
       true
@@ -145,7 +145,7 @@ export class ItemComponent implements OnInit, OnDestroy {
         } catch (error: any) {
           // this.loading = false;
           // this.mode = 1;
-          console.log(JSON.stringify(error.message));
+          // console.log(JSON.stringify(error.message));
           this.installedApps = [];
           callback(true);
         }

@@ -82,6 +82,7 @@ import { ProfileComponent } from './profile/profile.component';
 import { SafeUrlPipe } from './safe-url.pipe';
 import {ClipboardModule} from '@angular/cdk/clipboard';
 import { ItemComponent } from './item/item.component';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 
 @NgModule({
   declarations: [
@@ -162,7 +163,7 @@ import { ItemComponent } from './item/item.component';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [
     // Globals,
-    // { provide: USE_FUNCTIONS_EMULATOR, useValue: !environment.production ? ['localhost', 5001] : undefined },
+    // { provide: USE_FUNCTIONS_EMULATOR, useValue: !environment.production ? ['localhost', 4000] : undefined },
     { provide: LOCALE_ID, useValue: 'en-US' },
     { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' },
     {
@@ -173,7 +174,9 @@ import { ItemComponent } from './item/item.component';
   bootstrap: [AppComponent],
 })
 export class AppModule {
-  constructor(router: Router, functions: AngularFireFunctions) {
+  constructor(router: Router, functions: AngularFireFunctions, auth: AngularFireAuth) {
     // functions.useEmulator('localhost', 5001)
+    // auth.useEmulator('localhost')
+
   }
 }

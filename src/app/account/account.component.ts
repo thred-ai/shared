@@ -17,7 +17,12 @@ import { User } from '../user.model';
   styleUrls: ['./account.component.scss'],
 })
 export class AccountComponent implements OnInit {
-  constructor(private loadService: LoadService, private root: AppComponent, private clipboard: Clipboard, private _snackBar: MatSnackBar) {
+  constructor(
+    private loadService: LoadService,
+    private root: AppComponent,
+    private clipboard: Clipboard,
+    private _snackBar: MatSnackBar
+  ) {
     root.initApp();
   }
 
@@ -25,38 +30,48 @@ export class AccountComponent implements OnInit {
   user?: User;
   balance: ethers.BigNumber = ethers.BigNumber.from('0');
   chains: { chain: Chain; balance: ethers.BigNumber }[] = [];
-  address: string = ""
-  loggedIn: number = 0
+  address: string = '';
+  loggedIn: number = 0;
 
   async ngOnInit() {
-    console.log('OYYYYYY');
     this.provider = await this.loadService.initializeProvider();
     let signer = this.provider?.getSigner();
-    console.log('MAN');
-    let signedInUser = (await this.loadService.currentUser);
+    let signedInUser = await this.loadService.currentUser;
     //
-    if (signer && signedInUser && signedInUser.uid && signedInUser.metadata.lastSignInTime && this.provider != undefined) {
-      this.address = await signer.getAddress()
-      this.loggedIn = new Date(signedInUser.metadata.lastSignInTime).getTime()
+    if (
+      signer &&
+      signedInUser &&
+      signedInUser.uid &&
+      signedInUser.metadata.lastSignInTime &&
+      this.provider != undefined
+    ) {
+      this.address = await signer.getAddress();
+      this.loggedIn = new Date(signedInUser.metadata.lastSignInTime).getTime();
       await this.loadService.initProviders();
 
-      this.loadService.loadedChains.subscribe((chains) => {
-        chains.forEach((c) => {
-          this.chains.push({chain: c, balance: ethers.BigNumber.from("0")})
-          if (!this.provider) {
-            return;
-          }
-          this.loadService.checkChain(c.id, this.provider, async (result) => {
-            let balance = await signer?.getBalance('latest');
-            if (balance){
-              let index = this.chains.findIndex(b => b.chain.id == c.id)
-              if (index > -1){
-                this.chains[index].balance = balance
+      this.loadService.loadedChains.subscribe(async (chains) => {
+        await Promise.all(
+          chains.map(async (c) => {
+            this.chains.push({ chain: c, balance: ethers.BigNumber.from('0') });
+            if (!this.provider) {
+              return;
+            }
+            let balance = ethers.BigNumber.from(
+              await (window as any).ethereum.request({
+                method: 'eth_getBalance',
+                params: [this.address, 'latest'],
+                chainId: `${c.id}`,
+              })
+            );
+            if (balance) {
+              let index = this.chains.findIndex((b) => b.chain.id == c.id);
+              if (index > -1) {
+                this.chains[index].balance = balance;
               }
             }
             console.log(`${c.name} -- ${balance?.toNumber()}`);
-          });
-        });
+          })
+        );
       });
 
       this.loadService.getUserInfo(signedInUser.uid, false, false, (user) => {
@@ -71,31 +86,27 @@ export class AccountComponent implements OnInit {
     // console.log(await this.provider?.getBalance(await (this.provider.getSigner()).getAddress()))
   }
 
-  editProfile(){
-    (window as any).user = this.user
-    this.root.routeToEdit()
+  editProfile() {
+    (window as any).user = this.user;
+    this.root.routeToEdit();
   }
 
-  tabChange(event: MatTabChangeEvent){
-    this.root.butterfly?.initFly()
+  tabChange(event: MatTabChangeEvent) {
+    this.root.butterfly?.initFly();
   }
 
-  copy(){
-    this.clipboard.copy(this.address)
-    this._snackBar.open("Copied!", "OK", {})
+  copy() {
+    this.clipboard.copy(this.address);
+    this._snackBar.open('Copied!', 'OK', {});
   }
 
-  logOut(){
-    this.loadService.signOut(success => {
-      if (success){
-        this.root.routeToAuth()
+  logOut() {
+    this.loadService.signOut((success) => {
+      if (success) {
+        this.root.routeToAuth();
+      } else {
+        console.log('ERROR');
       }
-      else{
-        console.log("ERROR")
-      }
-    })
+    });
   }
-
-
-  
 }

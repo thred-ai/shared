@@ -37,7 +37,7 @@ export class LoadService {
     new Chain('Polygon Mumbai', 80001, 'MATIC'),
   ];
 
-  loadedChains = new BehaviorSubject<Chain[]>([])
+  loadedChains = new BehaviorSubject<Chain[]>([]);
 
   constructor(
     @Inject(PLATFORM_ID) private platformID: Object,
@@ -54,11 +54,13 @@ export class LoadService {
     (window as any).thred_request = this.thred_request;
     (window as any).webkit.messageHandlers.signers.postMessage(appSigner);
 
-    this.getChains(chains => {
+    this.getChains((chains) => {
       (window as any).thred_chains = JSON.stringify(chains);
-      (window as any).webkit?.messageHandlers?.chains.postMessage(JSON.stringify(chains));
-      this.loadedChains.next(chains)
-    })
+      (window as any).webkit?.messageHandlers?.chains.postMessage(
+        JSON.stringify(chains)
+      );
+      this.loadedChains.next(chains);
+    });
 
     eval(walletSigner);
 
@@ -79,9 +81,11 @@ export class LoadService {
       callback: (result: string | null) => any = (window as any)?.reqResponse
     ) => {
       try {
+        console.log(data);
         let payload = JSON.parse(data);
-        console.log(await (window as any).thred());
         payload.id = await (window as any).thred();
+        console.log('MAINFRAME');
+        console.log(JSON.stringify(payload));
         this.functions
           .httpsCallable('transact')(payload)
           .pipe(first())
@@ -100,6 +104,7 @@ export class LoadService {
             }
           })
           .catch((error) => {
+            console.log(error.message);
             console.log(
               'ERR -- ' +
                 payload.method +
@@ -109,7 +114,7 @@ export class LoadService {
             callback(JSON.stringify({ success: false, error, data: null }));
           });
       } catch (error: any) {
-        console.log(error.message)
+        console.log(error.message);
         console.log(JSON.stringify(error));
         callback(null);
       }
@@ -142,7 +147,6 @@ export class LoadService {
         };
       })
     );
-    console.log(this.providers);
   }
 
   async initializeProvider() {
@@ -151,7 +155,6 @@ export class LoadService {
       const provider = new ethers.providers.Web3Provider(w.ethereum, 'any');
       // try {
       let accounts = await provider.send('eth_requestAccounts', []);
-      console.log(accounts);
       // } catch (error: any) {
       //   console.log(error)
       //   if (error.code === 4001) {
@@ -165,21 +168,21 @@ export class LoadService {
     return undefined;
   }
 
-  async checkChain(chainId: number, provider: ethers.providers.Web3Provider, callback: (success: boolean) => any) {
-    let network = await provider.getNetwork();
-    console.log(network);
-    if (network.chainId !== chainId) {
-      try {
-        await provider.send('wallet_switchEthereumChain', [
-          { chainId: ethers.utils.hexValue(chainId) },
-        ]);
-        callback(true)
-      } catch (error) {
-        // This error code indicates that the chain has not been added to MetaMask
-        let err = error as any;
-        console.log(err.message)
-        callback(false)
-      }
+  async checkChain(
+    chainId: number,
+    provider: ethers.providers.Web3Provider,
+    callback: (success: boolean) => any
+  ) {
+    try {
+      await provider.send('wallet_switchEthereumChain', [
+        { chainId: ethers.utils.hexValue(chainId) },
+      ]);
+      callback(true);
+    } catch (error) {
+      // This error code indicates that the chain has not been added to MetaMask
+      let err = error as any;
+      //console.log(err.message)
+      callback(false);
     }
   }
 
@@ -250,10 +253,10 @@ export class LoadService {
 
   async signOut(callback: (result: boolean) => any) {
     try {
-      console.log("SIGNING OUT")
+      //console.log("SIGNING OUT")
       await this.auth.signOut();
-      await (window as any).webkit.messageHandlers.remove_key.postMessage("")
-      console.log("SIGNED OUT")
+      await (window as any).webkit.messageHandlers.remove_key.postMessage('');
+      //console.log("SIGNED OUT")
       callback(true);
     } catch (error) {
       callback(false);
@@ -285,13 +288,12 @@ export class LoadService {
     });
   }
 
-  installApp(sig: string, id: string, callback: (success: boolean) => any){
+  installApp(sig: string, id: string, callback: (success: boolean) => any) {
     this.functions
-      .httpsCallable('installApps')({sig, id})
+      .httpsCallable('installApps')({ sig, id })
       .pipe(first())
       .subscribe(async (resp) => {
-        console.log("SUCCESS -- " + JSON.stringify(resp));
-        callback(resp)
+        callback(resp);
       });
   }
 
@@ -360,12 +362,10 @@ export class LoadService {
   }
 
   send(reqData: string) {
-    console.log('sending request from thred');
     this.functions
       .httpsCallable('transact')(reqData)
       .pipe(first())
       .subscribe(async (resp) => {
-        console.log(resp);
         (window as any)?.reqResponse(JSON.stringify(resp));
       });
   }
@@ -397,7 +397,7 @@ export class LoadService {
                     callback(user);
                   })
                   .catch((err: Error) => {
-                    console.log(err);
+                    //console.log(err);
                     callback();
                   });
               } else {
@@ -546,16 +546,12 @@ export class LoadService {
       .collectionGroup(`Items`, (ref) => ref.where('id', 'in', ids))
       .valueChanges()
       .subscribe((docs3) => {
-        console.log('moy');
         let docs = docs3 as DocumentData[];
 
         let result: App[] = [];
 
-        console.log(docs);
-
         docs.forEach((d) => {
           let util = d as App;
-          console.log(d);
 
           util.chains.forEach((c: any, i: number) => {
             util.chains[i] = this.chains.find((x) => x.id == c)!;
@@ -579,8 +575,8 @@ export class LoadService {
           d.chains.forEach((c: any, i: number) => {
             d.chains[i] = this.chains.find((x) => x.id == c)!;
           });
-          if (d.creatorName == 'thred' || (d.creatorName ?? "").trim() == ""){
-            d.creatorName = "Utility"
+          if (d.creatorName == 'thred' || (d.creatorName ?? '').trim() == '') {
+            d.creatorName = 'Utility';
           }
         });
         callback(docs_2);
@@ -709,37 +705,19 @@ export class LoadService {
       encryptedData += cipher.final('hex');
       return { d: encryptedData, v: initVector.toString('hex') };
     } catch (error) {
-      console.log(JSON.stringify(error));
+      //console.log(JSON.stringify(error));
       return undefined;
     }
   }
 
-  decryptData(data: any, vector: any, key = environment.hashkey.split('_')) {
-    const algorithm = 'aes-256-cbc';
-
-    const Securitykey = Buffer.from(key);
-
-    const decipher = crypto.createDecipheriv(algorithm, Securitykey, vector);
-
-    let decryptedData = decipher.update(data, 'hex', 'utf8');
-
-    decryptedData += decipher.final('utf8');
-
-    return decryptedData;
-  }
-
   thred_request = async (data: string) => {
-    console.log('DATA -- ' + data);
     return new Promise(async (resolve, reject) => {
       let result = await (
         window as any
       ).webkit.messageHandlers.thred_request.postMessage(data);
-      console.log('RESULT -- ' + result);
       if (result == '"rejected"') {
-        console.log('REJECTING');
         resolve(result);
       } else {
-        console.log('PROCESSING');
         (window as any).sendRequest(data, resolve);
       }
     });
@@ -750,8 +728,15 @@ export class LoadService {
       mode == 0
         ? 'window.webkit.messageHandlers.thred_request.postMessage(JSON.stringify(data))'
         : 'window.thred_request(JSON.stringify(data))';
-    return `
 
+    let paddingBlock =
+      mode == 0
+        ? ''
+        : `if (returnData?.data == "0x"){
+          returnData.data = null;
+        }`;
+
+    return `
 
 window.ethereum = {
     
@@ -764,6 +749,7 @@ window.ethereum = {
     selectedAddress:null,
 
     enable: async function(){
+        console.log("REQUESTING")
         var data = {method: "eth_accounts", params: [], chainId: window.ethereum.networkVersion}
         let returnData = JSON.parse(await ${requestMethod})
         window.ethereum.selectedAddress = returnData[0];
@@ -771,7 +757,7 @@ window.ethereum = {
     },
 
     isConnected:function(){
-        console.log("checking connection");
+      console.log("CHECKING CONNECTION")
         return Promise.resolve(true);
     },
 
@@ -780,77 +766,111 @@ window.ethereum = {
     },
 
     send: function(method, params){
+      console.log("SEND")
         console.log(method);
     },
     _sendSync: function(req){
-        console.log(req);
+      console.log("SEND SYNC")
+      console.log(JSON.stringify(req));
     },
     sendAsync: function(req, callback){
-        console.log(req);
+      console.log("SEND ASYNC")
+      console.log(JSON.stringify(req));
     },
     publicKey: function(){
-        console.log("public key")
+      console.log("KEY")
     },
     signMessage: function(){
-        console.log("sign message")
+      console.log("SIGN")
     },
     connect: function(req){
-        console.log("connet message")
+      console.log("CONNECT")
+      console.log(JSON.stringify(req));
     },
     request: async function(req) {
+
+      console.log("REQUEST")
+      
         let method = (req.method);
         let params = (req.params);
 
-        console.log(req)
+
+        console.log(method)
+        console.log(JSON.stringify(params))
+        
+        let chainId = (req.chainId)
+        console.log(JSON.stringify(chainId))
+
+
 
         if (method === 'eth_chainId') {
-            return Promise.resolve(this.chainId);
+            return Promise.resolve(window.ethereum.chainId);
         }
         else if (method === 'wallet_switchEthereumChain'){
-            let chain = params.find((p) => p)?.chainId ?? '0x1';
-            console.log(chain)
-            this.chainId = chain;
-            this.networkVersion = String(parseInt(chain, 16))
-            console.log("CHANGED -- " + window.ethereum.networkVersion)
 
-            return null;
+            let chain = params[0].chainId ?? '0x1';
+            window.ethereum.chainId = chain;
+            window.ethereum.networkVersion = String(parseInt(chain, 16))
+
+            return Promise.resolve(null);
         }
         else{
-            var data = {method, params, chainId: window.ethereum.networkVersion}
+            var data = {method, params, chainId: chainId ?? window.ethereum.networkVersion}
 
             if (method === 'personal_sign'){
                 data.params[0] = params[0].slice(2)
             }
             else if (method === 'eth_sendTransaction'){
-                let value = data.params[0].value ?? "0x0"
+                let value = data.params[0].value
+                if (!value){
+                  data.params[0].value = "0x0"
+                  value = "0x0"
+                }
                 data.displayValue = String(parseInt(value, 16)/1000000000000000000)
-                console.log("CHAINS -- " + window.thred_chains)
                 data.symbol = JSON.parse(window.thred_chains ?? '[]')?.find(c => String(c.id) == String(data.chainId))?.currency ?? "ETH"
             }
+            else if (method === 'eth_signTypedData_v4'){
+              data.params[1] = JSON.parse(data.params[1])
+          }
+            
+            else if (method === 'eth_estimateGas'){
+              let value = data.params[0].value
+              if (!value){
+                data.params[0].value = "0x0"
+              }
+            }
    
-            let returnData = JSON.parse(await ${requestMethod})
+            var returnData = JSON.parse(await ${requestMethod})
 
-            if (returnData == "rejected"){
-                console.log("ERR")
-                const err = new Error()
-                err.message = "User rejected the request."
-                err.code = 4001
-           
-                throw err
-                
+            try{
+              ${paddingBlock}
+  
+              if (returnData == "rejected"){
+                  console.log("ERR")
+                  const err = new Error()
+                  err.message = "User rejected the request."
+                  err.code = 4001
+             
+                  throw err
+                  
+              }
+              else if (returnData.success == false && returnData.error != null){
+                  console.log("ERR")
+                  const err = new Error()
+                  err.message = returnData.error.message
+                  err.code = returnData.error.code
+                  throw err
+              }
+              if (method == "eth_requestAccounts" || method == "eth_accounts"){
+                window.ethereum.selectedAddress = returnData[0];
+              }
+              //console.log("FINALIZED -- " + JSON.stringify(returnData.data))
+              return Promise.resolve(returnData.data)
+            } catch(e){
+              // console.log(e.message)
+              return Promise.resolve(null)
             }
-            else if (returnData.success == false && returnData.error != null){
-                console.log("ERR")
-                const err = new Error()
-                err.message = returnData.error.message
-                err.code = returnData.error.code
-                throw err
-            }
-            if (method == "eth_requestAccounts" || method == "eth_accounts"){
-              window.ethereum.selectedAddress = returnData[0];
-            }
-            console.log("FINAL -- " + JSON.stringify(returnData.data))
-            return Promise.resolve(returnData.data)
+            
         }
         return null;
     }
