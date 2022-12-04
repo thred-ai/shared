@@ -12,13 +12,14 @@ import { LoadService } from '../load.service';
 })
 export class HomeComponent implements OnInit {
   constructor(private loadService: LoadService, private root: AppComponent, private cdr: ChangeDetectorRef) {
-    root.initApp()
   }
 
 
   
 
   async ngOnInit() {
+    this.root.initApp();
+
     // document.addEventListener('mousemove', (e) => {
     //   this.beginFlyAnimation()
     //   var fly = document.getElementById('flyRing');

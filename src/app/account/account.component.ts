@@ -23,7 +23,6 @@ export class AccountComponent implements OnInit {
     private clipboard: Clipboard,
     private _snackBar: MatSnackBar
   ) {
-    root.initApp();
   }
 
   provider?: ethers.providers.Web3Provider;
@@ -34,6 +33,8 @@ export class AccountComponent implements OnInit {
   loggedIn: number = 0;
 
   async ngOnInit() {
+    this.root.initApp();
+
     this.provider = await this.loadService.initializeProvider();
     let signer = this.provider?.getSigner();
     let signedInUser = await this.loadService.currentUser;
@@ -101,7 +102,7 @@ export class AccountComponent implements OnInit {
   }
 
   logOut() {
-    this.loadService.signOut((success) => {
+    this.loadService.signOut(this.root, (success) => {
       if (success) {
         this.root.routeToAuth();
       } else {

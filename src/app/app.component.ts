@@ -13,22 +13,26 @@ import { LoadService } from './load.service';
 export class AppComponent {
   title = '';
   signedIn?: Boolean;
+  uid?: string
 
   tabs = [
     {
       name: 'Discover',
       icon: 'search',
       link: '/store',
+      hide: "0x54Da21443C8D97B3aac5067Fd0B21c359D343Ea2"
     },
     {
       name: 'My Apps',
       icon: 'apps',
       link: '/home',
+      hide: "0x54Da21443C8D97B3aac5067Fd0B21c359D343Ea2",
     },
     {
       name: 'Account',
       icon: 'account_balance_wallet',
       link: '/account',
+      hide: null
     },
   ];
 
@@ -63,7 +67,9 @@ export class AppComponent {
       window.location.pathname == '/' ? '/home' : window.location.pathname;
 
     this.title = this.tabs.find((tab) => tab.link == url)?.name ?? 'App';
-    this.signedIn = (await this.loadService.currentUser)?.uid != undefined;
+    let uid = (await this.loadService.currentUser)?.uid
+    this.signedIn = uid != undefined;
+    this.uid = uid
   }
 
   isLocation(locations: string[]) {

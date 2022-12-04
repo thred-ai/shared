@@ -18,10 +18,10 @@ export class StoreComponent implements OnInit {
   address: string = ""
 
   constructor(private root: AppComponent, private loadService: LoadService) {
-    root.initApp();
   }
 
   async ngOnInit() {
+    this.root.initApp();
     let signedInUser = (await this.loadService.currentUser)?.uid;
     if (signedInUser) {
       await this.loadService.initProviders();

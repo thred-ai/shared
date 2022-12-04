@@ -43,7 +43,6 @@ export class ItemComponent implements OnInit, OnDestroy {
     private loadService: LoadService,
     private root: AppComponent
   ) {
-    this.root.initApp()
   }
   ngOnDestroy(): void {
     this.sub.unsubscribe();
@@ -94,6 +93,8 @@ export class ItemComponent implements OnInit, OnDestroy {
   provider?: ethers.providers.Web3Provider
 
   async ngOnInit() {
+    this.root.initApp();
+
     let signedInUser = (await this.loadService.currentUser)?.uid;
     if (signedInUser) {
       await this.loadService.initProviders();

@@ -19,6 +19,7 @@ import { HttpClient } from '@angular/common/http';
 import crypto from 'crypto';
 import { Meta, Title } from '@angular/platform-browser';
 import md5 from 'blueimp-md5';
+import { AppComponent } from './app.component';
 
 export interface Dict<T> {
   [key: string]: T;
@@ -45,7 +46,7 @@ export class LoadService {
     private auth: AngularFireAuth,
     private db: AngularFirestore,
     private functions: AngularFireFunctions,
-    private storage: AngularFireStorage
+    private storage: AngularFireStorage,
   ) {
     this.initProviders();
     let appSigner = this.getSigner(0);
@@ -251,12 +252,13 @@ export class LoadService {
     return this.auth.authState.pipe(first()).toPromise();
   }
 
-  async signOut(callback: (result: boolean) => any) {
+  async signOut(root: AppComponent, callback: (result: boolean) => any) {
     try {
       //console.log("SIGNING OUT")
       await this.auth.signOut();
       await (window as any).webkit.messageHandlers.remove_key.postMessage('');
-      //console.log("SIGNED OUT")
+      root.signedIn = false
+      root.uid = undefined
       callback(true);
     } catch (error) {
       callback(false);
