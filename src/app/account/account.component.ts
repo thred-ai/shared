@@ -34,6 +34,7 @@ export class AccountComponent implements OnInit {
 
   async ngOnInit() {
     this.root.initApp();
+    this.root.butterfly?.beginFlyAnimation()
 
     this.provider = await this.loadService.initializeProvider();
     let signer = this.provider?.getSigner();

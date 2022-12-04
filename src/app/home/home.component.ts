@@ -19,6 +19,7 @@ export class HomeComponent implements OnInit {
 
   async ngOnInit() {
     this.root.initApp();
+    this.root.butterfly?.beginFlyAnimation()
 
     // document.addEventListener('mousemove', (e) => {
     //   this.beginFlyAnimation()

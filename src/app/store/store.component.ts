@@ -22,6 +22,8 @@ export class StoreComponent implements OnInit {
 
   async ngOnInit() {
     this.root.initApp();
+    this.root.butterfly?.beginFlyAnimation()
+
     let signedInUser = (await this.loadService.currentUser)?.uid;
     if (signedInUser) {
       await this.loadService.initProviders();
