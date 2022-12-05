@@ -222,7 +222,7 @@ export class AuthComponent implements OnInit, OnDestroy {
         this.root.routeToProfile();
       });
     } else {
-      this.mode = 0;
+      this.mode = 1;
     }
     //
     window.onclick = (e) => {

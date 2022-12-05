@@ -26,6 +26,9 @@
     "@coinbase/wallet-sdk": "^3.5.0",
     "@fortawesome/fontawesome-free": "^6.0.0",
     "@google/model-viewer": "^1.12.0",
+    "@ledgerhq/hw-app-eth": "^6.30.1",
+    "@ledgerhq/hw-transport-web-ble": "^6.27.8",
+    "@ledgerhq/logs": "^6.10.1",
     "@metamask/detect-provider": "^1.2.0",
     "@mindsorg/web3modal-angular": "^1.7.1",
     "@ncstate/sat-popover": "^8.0.1",
@@ -108,6 +111,7 @@
     "payment": "^2.4.6",
     "process": "^0.11.10",
     "proxy-polyfill": "^0.3.2",
+    "qrcode": "^1.5.1",
     "rxfire": "^6.0.0",
     "rxjs": "~6.6.0",
     "seamless-scroll-polyfill": "^2.1.6",
@@ -167,5 +171,8 @@
     "utf-8-validate": "^5.0.5",
     "ws": "^8.0.0",
     "xhr2": "^0.2.1"
+  },
+  "alias": {
+    "@ledgerhq/devices": "@ledgerhq/devices/lib-es"
   }
 }

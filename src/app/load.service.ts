@@ -733,7 +733,9 @@ export class LoadService {
 
     let paddingBlock =
       mode == 0
-        ? ''
+        ? `if (returnData?.data == "0x"){
+          returnData.data = null;
+        }`
         : `if (returnData?.data == "0x"){
           returnData.data = null;
         }`;
