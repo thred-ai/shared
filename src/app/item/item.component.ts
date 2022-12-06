@@ -93,15 +93,18 @@ export class ItemComponent implements OnInit, OnDestroy {
   provider?: ethers.providers.Web3Provider
 
   async ngOnInit() {
-    this.root.initApp();
 
     let signedInUser = (await this.loadService.currentUser)?.uid;
     if (signedInUser) {
+      this.root.initApp();
       await this.loadService.initProviders();
       this.provider = await this.loadService.initializeProvider();
       this.loadApps(signedInUser, undefined, undefined, success => {
         this.getItem();
       })
+    }
+    else{
+      this.root.routeToAuth()
     }
   }
 

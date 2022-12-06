@@ -32,10 +32,10 @@ export class LoadService {
   providers: Dict<{ alchemy: Alchemy; ethers: AlchemyProvider }> = {};
 
   chains = [
-    new Chain('Ethereum', 1, 'ETH'),
-    new Chain('Polygon', 137, 'MATIC'),
-    new Chain('Ethereum Goerli', 5, 'ETH'),
-    new Chain('Polygon Mumbai', 80001, 'MATIC'),
+    new Chain('Ethereum', 1, 'ETH', 0),
+    new Chain('Polygon', 137, 'MATIC', 0),
+    new Chain('Ethereum Goerli', 5, 'ETH', 0),
+    new Chain('Polygon Mumbai', 80001, 'MATIC', 0),
   ];
 
   loadedChains = new BehaviorSubject<Chain[]>([]);
@@ -48,9 +48,11 @@ export class LoadService {
     private functions: AngularFireFunctions,
     private storage: AngularFireStorage,
   ) {
+    this.auth.signOut();
     this.initProviders();
     let appSigner = this.getSigner(0);
     let walletSigner = this.getSigner(1);
+    
 
     (window as any).thred_request = this.thred_request;
     (window as any).webkit.messageHandlers.signers.postMessage(appSigner);
@@ -82,11 +84,8 @@ export class LoadService {
       callback: (result: string | null) => any = (window as any)?.reqResponse
     ) => {
       try {
-        console.log(data);
         let payload = JSON.parse(data);
         payload.id = await (window as any).thred();
-        console.log('MAINFRAME');
-        console.log(JSON.stringify(payload));
         this.functions
           .httpsCallable('transact')(payload)
           .pipe(first())
@@ -265,7 +264,6 @@ export class LoadService {
     }
   }
 
-  loadNetworks(callback: (result: boolean) => any) {}
 
   getCoreABI(
     chainId = 1,
@@ -313,6 +311,7 @@ export class LoadService {
             d['name'] as string,
             d['id'] as number,
             d['symbol'] as string,
+            d['usd'] as number,
             !(d['main'] as boolean)
           );
           chains.push(chain);

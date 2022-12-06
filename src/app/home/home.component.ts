@@ -18,8 +18,7 @@ export class HomeComponent implements OnInit {
   
 
   async ngOnInit() {
-    this.root.initApp();
-    this.root.butterfly?.beginFlyAnimation()
+
 
     // document.addEventListener('mousemove', (e) => {
     //   this.beginFlyAnimation()
@@ -44,11 +43,18 @@ export class HomeComponent implements OnInit {
 
     let signedInUser =
       (await this.loadService.currentUser)?.uid;
+
     if (signedInUser) {
+      this.root.initApp();
+      this.root.butterfly?.beginFlyAnimation()
+      console.log(signedInUser)
       await this.loadService.initProviders();
 
 
       this.loadApps(signedInUser);//
+    }
+    else{
+      this.root.routeToAuth()
     }
   }
 

@@ -36,6 +36,9 @@ export class StoreComponent implements OnInit {
         });
       });
     }
+    else{
+      this.root.routeToAuth()
+    }
   }
 
   installed(app: App) {

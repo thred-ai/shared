@@ -51,12 +51,14 @@
             TOKENS
           </span>
         </ng-template>
+        <div
+          class="fw-bold text-white text-center text-truncate w-100 h4 py-3 pt-5"
+        >
+          <span class="fw-normal">Total Value: </span>{{ balance | currency : 'USD' : 'symbol' }}
+        </div>
         <div class="row row-cols-2 justify-content-center w-100 gx-0 p-1 py-2">
           <div class="col p-2" *ngFor="let chain of chains">
-            <div
-              class="w-100 body rounded-15 shadow"
-              style="aspect-ratio: 1"
-            >
+            <div class="w-100 body rounded-15 shadow" style="aspect-ratio: 1">
               <div
                 class="w-100 h-100 d-flex justify-content-center align-items-center flex-column"
               >
@@ -99,7 +101,13 @@
             class="w-100 p-3 body d-flex justify-content-between align-content-center rounded-15"
           >
             <div class="text-white">Profile</div>
-            <div class="fw-bold text-info" role="button" (click)="editProfile()">Edit</div>
+            <div
+              class="fw-bold text-info"
+              role="button"
+              (click)="editProfile()"
+            >
+              Edit
+            </div>
           </div>
           <div
             class="w-100 p-3 body d-flex justify-content-between align-content-center rounded-15 mt-3"
@@ -110,7 +118,7 @@
             </div>
           </div>
           <div
-            class="w-100 p-3 body d-flex justify-content-between align-content-center rounded-15  mt-3"
+            class="w-100 p-3 body d-flex justify-content-between align-content-center rounded-15 mt-3"
           >
             <div class="text-white">Joined</div>
             <div class="text-white fw-bold">
@@ -128,8 +136,9 @@
           <div
             class="w-100 p-3 bg-purple d-flex justify-content-center align-content-center rounded-15 shadow mt-3"
           >
-            <div class="fw-bold text-white" role="button" (click)="logOut()">Log Out</div>
-            
+            <div class="fw-bold text-white" role="button" (click)="logOut()">
+              Log Out
+            </div>
           </div>
         </div>
       </mat-tab>

@@ -74,7 +74,7 @@ export class App {
     this.reviews = reviews ?? 0;
     this.rating = rating ?? 0;
     this.downloads = downloads ?? 0;
-    this.chains = chains ?? [new Chain('Ethereum', 1, 'ETH')];
+    this.chains = chains ?? [new Chain('Ethereum', 1, 'ETH', 0)];
     this.coverUrl = coverUrl;
     this.status = status ?? 0;
     this.installWebhook = installWebhook ?? '';
