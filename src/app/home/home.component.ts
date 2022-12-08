@@ -15,6 +15,7 @@ export class HomeComponent implements OnInit {
   }
 
 
+  loading = false
   
 
   async ngOnInit() {
@@ -46,10 +47,10 @@ export class HomeComponent implements OnInit {
 
     if (signedInUser) {
       this.root.initApp();
-      this.root.butterfly?.beginFlyAnimation()
+      // this.root.butterfly?.beginFlyAnimation()
       console.log(signedInUser)
       await this.loadService.initProviders();
-
+      this.loading = true
 
       this.loadApps(signedInUser);//
     }
@@ -70,7 +71,7 @@ export class HomeComponent implements OnInit {
     provider = this.loadService.providers[chainId].ethers
   ) {
     // this.loading = true;
-
+//
     this.loadService.getCoreABI(chainId, async (result) => {
       if (result) {
         let abi = result.abi;
@@ -88,16 +89,18 @@ export class HomeComponent implements OnInit {
             // this.mode = 1;
 
             //
-
+            
             setTimeout(() => {
               this.apps = apps ?? [];
+              this.loading = false
               this.cdr.detectChanges()
-              this.root.butterfly?.initFly()
+              // this.root.butterfly?.initFly()
             }, 500);
           });
         } catch (error) {
           // this.loading = false;
           // this.mode = 1;
+          this.loading = false
           this.apps = [];
         }
       }

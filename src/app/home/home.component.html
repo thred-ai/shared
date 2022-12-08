@@ -1,6 +1,6 @@
 <div
   class="w-100 d-flex justify-content-start flex-column align-items-center no-select animate__animated animate__fadeIn"
-  style="min-height: 57.5vh; padding-bottom: 150px"
+  style="min-height: 57.5vh;"
 >
   <!-- <div
     class="border border-2 border-pink rounded-circle animate__animated animate__fadeIn position-absolute"
@@ -20,7 +20,7 @@
     <i></i>
   </div> -->
 
-  <ng-container *ngIf="apps">
+  <ng-container *ngIf="apps && !loading">
     <div
       class="w-100 row row-cols-4 justify-content-start p-2 p-md-5 gx-0 animate__animated animate__fadeIn"
       *ngIf="apps.length > 0"
@@ -55,22 +55,12 @@
         </p>
       </div>
     </div>
-
   </ng-container>
-  <!-- <ng-container *ngIf="!apps">
+  <ng-container *ngIf="loading">
     <div
       class="w-100 vh-80 d-flex justify-content-center flex-column align-items-center no-select position-fixed animate__animated animate__fadeIn"
     >
-      <div id="fly">
-        <i></i>
-        <i></i>
-        <i></i>
-        <i></i>
-      </div>
-      <div id="cursor">
-        <i></i>
-        <i></i>
-      </div>
+      <span class="loader"></span>
     </div>
-  </ng-container> -->
+  </ng-container>
 </div>

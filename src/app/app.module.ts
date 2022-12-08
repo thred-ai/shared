@@ -101,7 +101,7 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
     NameEnsLookupPipe,
     TypeNumberPipe,
     IsLocationPipe,
-    SafeUrlPipe
+    SafeUrlPipe,
   ],
   imports: [
     CommonModule,

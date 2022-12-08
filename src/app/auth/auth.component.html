@@ -4,12 +4,13 @@
 >
   <div
     class="w-100 h-100 d-flex flex-column justify-content-center align-items-center position-relative"
+    *ngIf="mode != 3"
   >
-    <img
+    <!-- <img
       class="w-100 h-100"
       [src]="'assets/auth_design.svg'"
       style="object-fit: cover"
-    />
+    /> -->
     <div
       class="position-absolute w-100 h-100 d-flex justify-content-center align-items-center px-3 pt-2 pt-md-0"
     >
@@ -21,7 +22,7 @@
         "
       >
         <div
-          class="rounded-15 bar big-design-card border border-pink h-100 w-100 text-light"
+          class="rounded-15 bar big-design-card h-100 w-100 text-light shadow-0"
           style="z-index: 50"
         >
           <ng-container *ngIf="mode == 0">
@@ -116,7 +117,7 @@
                 </div>
                 <div class="w-100 py-1 mt-3">
                   <button
-                    class="btn bg-purple rounded-15 text-white px-5 py-3 fw-bold w-100 mt-1"
+                    class="btn body shadow rounded-15 text-pink px-5 py-3 fw-bold w-100 mt-1"
                     (click)="continue()"
                     id="continue"
                   >
@@ -214,7 +215,7 @@
                 </div>
                 <div class="w-100 py-1 mt-3">
                   <button
-                    class="btn bg-purple rounded-15 text-white px-5 py-3 fw-bold w-100 mt-1"
+                    class="btn body shadow rounded-15 text-pink px-5 py-3 fw-bold w-100 mt-1"
                     (click)="continue()"
                     id="continue"
                   >
@@ -244,11 +245,15 @@
               </div>
             </div>
           </ng-container>
-          <ng-container *ngIf="mode == 3">
-            <app-butterfly></app-butterfly>
-          </ng-container>
         </div>
       </form>
     </div>
   </div>
+  <ng-container *ngIf="mode == 3">
+    <div
+      class="w-100 vh-80 d-flex justify-content-center flex-column align-items-center no-select position-fixed animate__animated animate__fadeIn"
+    >
+      <span class="text-loader fw-bold">THRED</span>
+    </div>
+  </ng-container>
 </div>

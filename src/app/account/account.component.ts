@@ -30,6 +30,7 @@ export class AccountComponent implements OnInit {
   chains: { chain: Chain; balance: ethers.BigNumber }[] = [];
   address: string = '';
   loggedIn: number = 0;
+  loading = false
 
   async ngOnInit() {
 
@@ -38,8 +39,8 @@ export class AccountComponent implements OnInit {
     console.log("USER -- " + JSON.stringify(signedInUser?.uid))
     if (signedInUser && signedInUser.uid) {
       this.root.initApp();
-      this.root.butterfly?.beginFlyAnimation();
-
+      // this.root.butterfly?.beginFlyAnimation();
+      this.loading = true
       this.provider = await this.loadService.initializeProvider();
       let signer = this.provider?.getSigner();
       //
@@ -81,11 +82,13 @@ export class AccountComponent implements OnInit {
 
         this.loadService.getUserInfo(signedInUser.uid, false, false, (user) => {
           this.user = user;
-          this.root.butterfly?.initFly();
-          setTimeout(() => {}, 2000);
+          this.loading = false
+          // this.root.butterfly?.initFly();
+          // setTimeout(() => {}, 2000);
         });
       }
     } else {
+      this.loading = false
       this.root.routeToAuth();
     }
 

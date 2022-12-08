@@ -1,11 +1,11 @@
 <div
-  class="w-100 body animate__animated animate__slideInRight animate__fadeIn animate__faster"
+  class="w-100 bar animate__animated animate__slideInRight animate__fadeIn animate__faster"
   style="min-height: 67.5vh"
 >
-  <div class="w-100 body">
-    <div class="w-100 bar h-100">
+  <div class="w-100">
+    <div class="w-100 h-100">
       <div
-        class="d-flex justify-content-center align-content-center p-2 pt-3"
+        class="d-flex justify-content-center align-content-center p-3"
         style="width: 30px"
       >
         <mat-icon
@@ -18,7 +18,7 @@
         </mat-icon>
       </div>
       <div
-        class="w-100 d-flex justify-content-center align-content-center py-1 py-md-2"
+        class="w-100 d-flex justify-content-center align-content-center py-1 py-md-2 border-top border-white body"
       >
         <div
           class="w-100 w-md-75 p-2 p-md-0 my-auto d-flex flex-column flex-md-row justify-content-between align-content-center"
@@ -28,12 +28,12 @@
             style="height: 100px"
           >
             <div
-              class="m-auto rounded-15 shadow body"
+              class="m-auto rounded-15 shadow body border-white border"
               style="height: 75%; aspect-ratio: 1"
             >
               <img
                 class="rounded-15 w-100 h-100"
-                style="object-fit: contain"
+                style="object-fit: cover"
                 *ngIf="(item?.displayUrls ?? [])[0]"
                 [src]="(item?.displayUrls ?? [])[0]"
                 role="button"
@@ -64,7 +64,7 @@
 
     <div class="w-100 h-100">
       <div
-        class="w-100 h-100 body border-top pt-5 pt-md-2 pe-md-3 d-flex justify-content-center align-items-start"
+        class="w-100 h-100 bar border-top pt-5 pt-md-2 pe-md-3 d-flex justify-content-center align-items-start"
       >
         <div
           class="w-100 w-md-75 h-100 d-flex flex-column flex-md-row justify-content-between align-items-start"
@@ -95,17 +95,9 @@
           >
             <div
               class="w-100 h-100"
-              *ngIf="item && (item.etherPrice | formatEther) as ether"
+              *ngIf="item"
             >
-              <b style="font-size: 25px">Details</b>
-              <hr class="mt-1" />
-              <span style="font-weight: 500"> Base Price: </span>
-              {{ ether != "0.0" ? ether : "Free" }}
-              <br />
-              <span style="font-weight: 500"> Network: </span>
-              {{ chains(item) }}
-              <br />
-              <br />
+
 
               <b style="font-size: 25px">Information</b>
               <hr class="mt-1" />
@@ -131,7 +123,7 @@
     *ngIf="item"
   >
     <a
-      class="btn bg-purple text-white rounded-15 px-5 py-3 my-1 fw-bold w-100"
+      class="btn body text-pink rounded-15 px-5 py-3 my-1 fw-bold w-100"
       (click)="installed(item) ? openApp(item) : installApp(item)"
     >
       {{

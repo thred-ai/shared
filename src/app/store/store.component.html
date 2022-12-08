@@ -1,6 +1,6 @@
 <div
   class="w-100 bar animate__animated animate__fadeIn"
-  style="min-height: 67.5vh; padding-bottom: 150px"
+  style="min-height: 67.5vh"
 >
   <div class="w-100 p-2" *ngIf="apps">
     <div
@@ -43,24 +43,17 @@
           style="font-size: small"
         >
           {{
-            listed(app)
-              ? loading == 0 || installingId !== app.id
-                ? installed(app)
-                  ? "Launch"
-                  : "Install"
-                : loading == 1
-                ? "Verifying"
-                : loading == 2
-                ? "Installing"
-                : loading == 3
-                ? "Installed"
-                : loading == 4
-                ? "Install Failed"
-                : "Not Available"
-              : "Inactive"
+            "View"
           }}
         </div>
       </div>
     </div>
   </div>
+  <ng-container *ngIf="loading">
+    <div
+      class="w-100 vh-80 d-flex justify-content-center flex-column align-items-center no-select position-fixed animate__animated animate__fadeIn"
+    >
+      <span class="loader"></span>
+    </div>
+  </ng-container>
 </div>
