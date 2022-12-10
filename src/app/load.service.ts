@@ -756,7 +756,7 @@ window.ethereum = {
         var data = {method: "eth_accounts", params: [], chainId: window.ethereum.networkVersion}
         let returnData = JSON.parse(await ${requestMethod})
         window.ethereum.selectedAddress = returnData[0];
-        return Promise.resolve(str);
+        return Promise.resolve(returnData);
     },
 
     isConnected:function(){
@@ -765,12 +765,12 @@ window.ethereum = {
     },
 
     _metamask:{
-      isUnlocked: function(){ return true }
+      isUnlocked: async function(){ return Promise.resolve(true) }
     },
 
-    send: function(method, params){
-      console.log("SEND")
-        console.log(method);
+    send: async function(method, params = {}){
+      let returnData = await (window.ethereum.request({method, params}))
+      return Promise.resolve(returnData)
     },
     _sendSync: function(req){
       console.log("SEND SYNC")
@@ -779,7 +779,28 @@ window.ethereum = {
     sendAsync: function(req, callback){
       console.log("SEND ASYNC")
       console.log(JSON.stringify(req));
+
+      let jsonrpc = req.jsonrpc
+      let id = req.id
+      let method = req.method
+      let params = req.params
+
+      try{
+        let returnData = window.ethereum.request(req).then(returnData => {
+          console.log("DATA -- " + JSON.stringify(returnData))
+          console.log(returnData)
+          callback(null, {jsonrpc, id, method, result: returnData}) //
+        }).catch((e) => {
+          console.error(JSON.stringify(e.message));
+          callback(e, null)
+        })
+
+      } catch (err){
+        console.log(JSON.stringify(err))
+        callback(err, null)
+      }
     },
+
     publicKey: function(){
       console.log("KEY")
     },
