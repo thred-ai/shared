@@ -46,26 +46,31 @@ export class LoadService {
     private auth: AngularFireAuth,
     private db: AngularFirestore,
     private functions: AngularFireFunctions,
-    private storage: AngularFireStorage,
+    private storage: AngularFireStorage
   ) {
     this.auth.signOut();
     this.initProviders();
-    let appSigner = this.getSigner(0);
-    let walletSigner = this.getSigner(1);
-    
 
-    (window as any).thred_request = this.thred_request;
-    (window as any).webkit.messageHandlers.signers.postMessage(appSigner);
+    this.getSigners((signers) => {
+      if (!signers) { return }
+      let injectedSigner = signers?.injectedSigner;
+      let nativeSigner = signers?.nativeSigner;
 
-    this.getChains((chains) => {
-      (window as any).thred_chains = JSON.stringify(chains);
-      (window as any).webkit?.messageHandlers?.chains.postMessage(
-        JSON.stringify(chains)
-      );
-      this.loadedChains.next(chains);
+      (window as any).thred_request = this.thred_request;
+      (window as any).webkit.messageHandlers.signers.postMessage(injectedSigner);
+
+      this.getChains((chains) => {
+        (window as any).thred_chains = JSON.stringify(chains);
+        (window as any).webkit?.messageHandlers?.chains.postMessage(
+          JSON.stringify(chains)
+        );
+        this.loadedChains.next(chains);
+      });
+
+      console.log("NATIVE SIGNER -- " + JSON.stringify(nativeSigner))
+
+      eval(nativeSigner);
     });
-
-    eval(walletSigner);
 
     this.setRequest();
   }
@@ -256,14 +261,13 @@ export class LoadService {
       //console.log("SIGNING OUT")
       await this.auth.signOut();
       await (window as any).webkit.messageHandlers.remove_key.postMessage('');
-      root.signedIn = false
-      root.uid = undefined
+      root.signedIn = false;
+      root.uid = undefined;
       callback(true);
     } catch (error) {
       callback(false);
     }
   }
-
 
   getCoreABI(
     chainId = 1,
@@ -298,7 +302,9 @@ export class LoadService {
   }
 
   getChains(callback: (result: Chain[]) => any) {
-    var query = this.db.collection('Networks');
+    var query = this.db.collection('Networks', (ref) =>
+      ref.where('main', '==', true)
+    );
 
     let sub = query.valueChanges().subscribe((docs) => {
       sub.unsubscribe();
@@ -724,183 +730,32 @@ export class LoadService {
     });
   };
 
-  getSigner(mode = 0) {
-    let requestMethod =
-      mode == 0
-        ? 'window.webkit.messageHandlers.thred_request.postMessage(JSON.stringify(data))'
-        : 'window.thred_request(JSON.stringify(data))';
-
-    let paddingBlock =
-      mode == 0
-        ? `if (returnData?.data == "0x"){
-          returnData.data = null;
-        }`
-        : `if (returnData?.data == "0x"){
-          returnData.data = null;
-        }`;
-
-    return `
-
-window.ethereum = {
-    
-    chainId: "0x89",
-    
-    networkVersion: "137",
-
-    isMetaMask:true,
-
-    selectedAddress:null,
-
-    enable: async function(){
-        console.log("REQUESTING")
-        var data = {method: "eth_accounts", params: [], chainId: window.ethereum.networkVersion}
-        let returnData = JSON.parse(await ${requestMethod})
-        window.ethereum.selectedAddress = returnData[0];
-        return Promise.resolve(returnData);
-    },
-
-    isConnected:function(){
-      console.log("CHECKING CONNECTION")
-        return Promise.resolve(true);
-    },
-
-    _metamask:{
-      isUnlocked: async function(){ return Promise.resolve(true) }
-    },
-
-    send: async function(method, params = {}){
-      let returnData = await (window.ethereum.request({method, params}))
-      return Promise.resolve(returnData)
-    },
-    _sendSync: function(req){
-      console.log("SEND SYNC")
-      console.log(JSON.stringify(req));
-    },
-    sendAsync: function(req, callback){
-      console.log("SEND ASYNC")
-      console.log(JSON.stringify(req));
-
-      let jsonrpc = req.jsonrpc
-      let id = req.id
-      let method = req.method
-      let params = req.params
-
-      try{
-        let returnData = window.ethereum.request(req).then(returnData => {
-          console.log("DATA -- " + JSON.stringify(returnData))
-          console.log(returnData)
-          callback(null, {jsonrpc, id, method, result: returnData}) //
-        }).catch((e) => {
-          console.error(JSON.stringify(e.message));
-          callback(e, null)
-        })
-
-      } catch (err){
-        console.log(JSON.stringify(err))
-        callback(err, null)
-      }
-    },
-
-    publicKey: function(){
-      console.log("KEY")
-    },
-    signMessage: function(){
-      console.log("SIGN")
-    },
-    connect: function(req){
-      console.log("CONNECT")
-      console.log(JSON.stringify(req));
-    },
-    request: async function(req) {
-
-      console.log("REQUEST")
-      
-        let method = (req.method);
-        let params = (req.params);
-
-
-        console.log(method)
-        console.log(JSON.stringify(params))
-        
-        let chainId = (req.chainId)
-        console.log(JSON.stringify(chainId))
-
-
-
-        if (method === 'eth_chainId') {
-            return Promise.resolve(window.ethereum.chainId);
-        }
-        else if (method === 'wallet_switchEthereumChain'){
-
-            let chain = params[0].chainId ?? '0x1';
-            window.ethereum.chainId = chain;
-            window.ethereum.networkVersion = String(parseInt(chain, 16))
-
-            return Promise.resolve(null);
-        }
-        else{
-            var data = {method, params, chainId: chainId ?? window.ethereum.networkVersion}
-
-            if (method === 'personal_sign'){
-                data.params[0] = params[0].slice(2)
-            }
-            else if (method === 'eth_sendTransaction'){
-                let value = data.params[0].value
-                if (!value){
-                  data.params[0].value = "0x0"
-                  value = "0x0"
-                }
-                data.displayValue = String(parseInt(value, 16)/1000000000000000000)
-                data.symbol = JSON.parse(window.thred_chains ?? '[]')?.find(c => String(c.id) == String(data.chainId))?.currency ?? "ETH"
-            }
-            else if (method === 'eth_signTypedData_v4'){
-              data.params[1] = JSON.parse(data.params[1])
+  getSigners(
+    callback: (result?: { injectedSigner: string; nativeSigner: string }) => any
+  ) {
+    try {
+      this.functions
+        .httpsCallable('getSigners')({})
+        .pipe(first())
+        .toPromise()
+        .then((resp) => {
+          if (resp) {
+            //
+            console.log(JSON.stringify(resp))
+            callback({
+              injectedSigner: resp.signer1 as string,
+              nativeSigner: resp.signer2 as string,
+            });
           }
-            
-            else if (method === 'eth_estimateGas'){
-              let value = data.params[0].value
-              if (!value){
-                data.params[0].value = "0x0"
-              }
-            }
-   
-            var returnData = JSON.parse(await ${requestMethod})
-
-            try{
-              ${paddingBlock}
-  
-              if (returnData == "rejected"){
-                  console.log("ERR")
-                  const err = new Error()
-                  err.message = "User rejected the request."
-                  err.code = 4001
-             
-                  throw err
-                  
-              }
-              else if (returnData.success == false && returnData.error != null){
-                  console.log("ERR")
-                  const err = new Error()
-                  err.message = returnData.error.message
-                  err.code = returnData.error.code
-                  throw err
-              }
-              if (method == "eth_requestAccounts" || method == "eth_accounts"){
-                window.ethereum.selectedAddress = returnData[0];
-              }
-              //console.log("FINALIZED -- " + JSON.stringify(returnData.data))
-              return Promise.resolve(returnData.data)
-            } catch(e){
-              // console.log(e.message)
-              return Promise.resolve(null)
-            }
-            
-        }
-        return null;
+        })
+        .catch((error) => {
+          console.log(error.message);
+          callback();
+        });
+    } catch (error: any) {
+      console.log(error.message);
+      console.log(JSON.stringify(error));
+      callback();
     }
-
-}
-
-`;
   }
 }
