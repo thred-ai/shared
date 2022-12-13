@@ -83,6 +83,10 @@ import { SafeUrlPipe } from './safe-url.pipe';
 import {ClipboardModule} from '@angular/cdk/clipboard';
 import { ItemComponent } from './item/item.component';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { NetworkComponent } from './network/network.component';
+import { FirstLetterPipe } from './first-letter.pipe';
+import { NumValuePipe } from './num-value.pipe';
+import { TokenFilterPipe } from './token-filter.pipe';
 
 @NgModule({
   declarations: [
@@ -102,6 +106,10 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
     TypeNumberPipe,
     IsLocationPipe,
     SafeUrlPipe,
+    NetworkComponent,
+    FirstLetterPipe,
+    NumValuePipe,
+    TokenFilterPipe,
   ],
   imports: [
     CommonModule,

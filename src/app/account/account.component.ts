@@ -104,6 +104,10 @@ export class AccountComponent implements OnInit {
     this.root.butterfly?.initFly();
   }
 
+  openNetwork(id: number){
+    this.root.routeToNetwork(id)
+  }
+
   copy() {
     this.clipboard.copy(this.address);
     this._snackBar.open('Copied!', 'OK', {});

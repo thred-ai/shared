@@ -1,0 +1,108 @@
+<div class="w-100 bar no-select" style="min-height: 67.5vh">
+  <div
+    class="w-100 animate__animated animate__slideInUp animate__faster"
+    *ngIf="!loading"
+  >
+    <div
+      class="d-flex justify-content-center align-content-center p-3"
+      style="width: 30px"
+    >
+      <mat-icon
+        class="w-100 my-auto fw-bolder text-white"
+        role="button"
+        (click)="back()"
+        style="font-size: x-large"
+      >
+        keyboard_arrow_left
+      </mat-icon>
+    </div>
+    <div class="w-100 p-2 px-3" *ngIf="tokens">
+      <div class="w-100 text-start text-pink fw-bold h5">Total Value</div>
+        <div
+          class="fw-bold text-white text-start text-truncate w-100 h1 pt-0 pb-4"
+          *ngIf="chain"
+        >
+          {{
+            ((balance | formatEther | numValue) ?? 0) * chain.rate
+              | currency: "USD":"symbol"
+          }}
+        </div>
+      <ng-container *ngIf="(tokens | tokenFilter).length > 0">
+        
+        <div class="w-100 text-start text-pink fw-bold h5">My Tokens</div>
+
+        <div class="w-100 py-1" *ngFor="let token of (tokens | tokenFilter)" role="button">
+          <div
+            class="w-100 p-2 body d-flex justify-content-between align-content-center rounded-pill"
+          >
+            <div
+              class="w-100 d-flex justify-content-start align-content-center"
+            >
+              <div
+                class="rounded-circle border d-flex justify-content-center align-content-center shadow bar"
+                style="aspect-ratio: 1; width: 65px; overflow: hidden"
+              >
+                <div
+                  class="m-auto position-relative rounded-15 d-flex justify-content-center align-content-center"
+                  style="height: 100%; width: 100%; overflow: hidden"
+                  role="button"
+                >
+                  <img
+                    *ngIf="token.url"
+                    class="w-100 h-100"
+                    style="object-fit: cover"
+                    [src]="token.url | safeUrl"
+                  />
+
+                  <div
+                    *ngIf="!token.url"
+                    class="fw-bolder text-pink my-auto h2"
+                  >
+                    {{ token.name | firstLetter }}
+                  </div>
+                </div>
+              </div>
+              <div class="my-auto ms-3 w-33">
+                <div class="text-white fw-bold">
+                  {{ token.name }}
+                </div>
+                <div
+                  class="text-pink w-100 text-truncate fw-bold"
+                  style="font-size: small"
+                  *ngIf="(token.balance | formatEther: 2) as subBalance"
+                >
+                  {{ (((subBalance | numValue) ?? 0) < 0.01) ? token.address == "" ? "No" : "< 0.01" : subBalance }} {{ token.symbol }}
+                </div>
+              </div>
+            </div>
+            <div
+              class="py-2 px-3 fw-bold text-white rounded-pill my-auto"
+              style="font-size: medium"
+              *ngIf="token.balance | formatEther as balance"
+            >
+              {{
+                ((balance | numValue) ?? 0) > 0 && token.rate > 0
+                  ? (((balance | numValue) ?? 0) * token.rate
+                    | currency: "USD":"symbol")
+                  : ("0" | currency: "USD":"symbol")
+              }}
+            </div>
+          </div>
+        </div> 
+      </ng-container>
+      <ng-container *ngIf="(tokens | tokenFilter).length == 0">
+        <div class="w-100 text-center text-white h3 fw-bolder">
+          No tokens to display
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <ng-container *ngIf="loading">
+    <div
+      class="w-100 vh-80 d-flex justify-content-center flex-column align-items-center no-select position-fixed animate__animated animate__fadeIn"
+    >
+      <span class="loader"></span>
+    </div>
+  </ng-container>
+</div>

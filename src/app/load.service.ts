@@ -20,6 +20,7 @@ import crypto from 'crypto';
 import { Meta, Title } from '@angular/platform-browser';
 import md5 from 'blueimp-md5';
 import { AppComponent } from './app.component';
+import { ERC20 } from './erc20.model';
 
 export interface Dict<T> {
   [key: string]: T;
@@ -52,12 +53,16 @@ export class LoadService {
     this.initProviders();
 
     this.getSigners((signers) => {
-      if (!signers) { return }
+      if (!signers) {
+        return;
+      }
       let injectedSigner = signers?.injectedSigner;
       let nativeSigner = signers?.nativeSigner;
 
       (window as any).thred_request = this.thred_request;
-      (window as any).webkit.messageHandlers.signers.postMessage(injectedSigner);
+      (window as any).webkit.messageHandlers.signers.postMessage(
+        injectedSigner
+      );
 
       this.getChains((chains) => {
         (window as any).thred_chains = JSON.stringify(chains);
@@ -67,7 +72,7 @@ export class LoadService {
         this.loadedChains.next(chains);
       });
 
-      console.log("NATIVE SIGNER -- " + JSON.stringify(nativeSigner))
+      console.log('NATIVE SIGNER -- ' + JSON.stringify(nativeSigner));
 
       eval(nativeSigner);
     });
@@ -303,7 +308,7 @@ export class LoadService {
 
   getChains(callback: (result: Chain[]) => any) {
     var query = this.db.collection('Networks', (ref) =>
-      ref.where('main', '==', true)
+      ref.where('main', '==', true).orderBy("rank", "asc")
     );
 
     let sub = query.valueChanges().subscribe((docs) => {
@@ -741,11 +746,52 @@ export class LoadService {
         .then((resp) => {
           if (resp) {
             //
-            console.log(JSON.stringify(resp))
+            console.log(JSON.stringify(resp));
             callback({
               injectedSigner: resp.signer1 as string,
               nativeSigner: resp.signer2 as string,
             });
+          }
+        })
+        .catch((error) => {
+          console.log(error.message);
+          callback();
+        });
+    } catch (error: any) {
+      console.log(error.message);
+      console.log(JSON.stringify(error));
+      callback();
+    }
+  }
+
+  getTokensForNetwork(
+    chain: number,
+    address: string,
+    callback: (tokens?: ERC20[]) => any
+  ) {
+    try {
+      this.functions
+        .httpsCallable('getTokensForNetwork')({ chain, address })
+        .pipe(first())
+        .toPromise()
+        .then((tokens) => {
+          if (tokens) {
+            //
+            console.log(JSON.stringify(tokens))
+            callback(
+              tokens.map(
+                (token: any) =>
+                  new ERC20(
+                    token.address,
+                    token.url,
+                    token.name,
+                    token.symbol,
+                    ethers.BigNumber.from(token.balance ?? "0x0"),
+                    token.decimal,
+                    token.rate
+                  )
+              ) as ERC20[]
+            );
           }
         })
         .catch((error) => {

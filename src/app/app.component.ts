@@ -60,13 +60,13 @@ export class AppComponent {
     }
   }
 
-  async initApp() {
+  async initApp(title = "App") {
 
 
     let url =
       window.location.pathname == '/' ? '/home' : window.location.pathname;
 
-    this.title = this.tabs.find((tab) => tab.link == url)?.name ?? 'App';
+    this.title = this.tabs.find((tab) => tab.link == url)?.name ?? title;
     let uid = (await this.loadService.currentUser)?.uid
     this.signedIn = uid != undefined;
     this.uid = uid
@@ -96,5 +96,9 @@ export class AppComponent {
 
   routeToItem(id: string) {
     this._router.navigateByUrl(`/store/${id}`); //
+  }
+
+  routeToNetwork(id: number) {
+    this._router.navigateByUrl(`/network/${id}`); //
   }
 }
