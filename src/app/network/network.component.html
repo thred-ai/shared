@@ -1,6 +1,6 @@
 <div class="w-100 bar no-select" style="min-height: 67.5vh">
   <div
-    class="w-100 animate__animated animate__slideInUp animate__faster"
+    class="w-100 animate__animated animate__slideInRight animate__fadeIn animate__faster"
     *ngIf="!loading"
   >
     <div
@@ -16,10 +16,12 @@
         keyboard_arrow_left
       </mat-icon>
     </div>
-    <div class="w-100 p-2 px-3" *ngIf="tokens">
+    <div class="w-100 p-2 pt-0 px-3" *ngIf="tokens">
+      <hr class="text-pink border-pink">
+
       <div class="w-100 text-start text-pink fw-bold h5">Total Value</div>
         <div
-          class="fw-bold text-white text-start text-truncate w-100 h1 pt-0 pb-4"
+          class="fw-bold text-white text-start text-truncate w-100 h1 pt-2 pb-0"
           *ngIf="chain"
         >
           {{
@@ -28,7 +30,7 @@
           }}
         </div>
       <ng-container *ngIf="(tokens | tokenFilter).length > 0">
-        
+        <hr class="text-pink border-pink">
         <div class="w-100 text-start text-pink fw-bold h5">My Tokens</div>
 
         <div class="w-100 py-1" *ngFor="let token of (tokens | tokenFilter)" role="button">

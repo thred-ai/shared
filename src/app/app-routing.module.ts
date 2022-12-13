@@ -15,7 +15,7 @@ const routes: Routes = [
   { path: 'auth', component: AuthComponent, pathMatch: 'full' },
   { path: 'edit', component: ProfileComponent, pathMatch: 'full' },
   { path: 'store/:app', component: ItemComponent, pathMatch: 'full' },
-  { path: 'network/:network', component: NetworkComponent, pathMatch: 'full' },
+  { path: 'account/:network', component: NetworkComponent, pathMatch: 'full' },
 
   { path: '', redirectTo: '/auth', pathMatch: 'full' },
   // { path: '/:any', redirectTo: '/home', pathMatch: 'full' },

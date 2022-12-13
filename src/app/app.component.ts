@@ -99,6 +99,6 @@ export class AppComponent {
   }
 
   routeToNetwork(id: number) {
-    this._router.navigateByUrl(`/network/${id}`); //
+    this._router.navigateByUrl(`/account/${id}`); //
   }
 }
