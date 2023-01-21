@@ -2,7 +2,6 @@ import { Component, ViewChild } from '@angular/core';
 import { initializeApp } from '@angular/fire/app';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ethers } from 'ethers';
-import { ButterflyComponent } from './butterfly/butterfly.component';
 import { LoadService } from './load.service';
 
 @Component({
@@ -50,7 +49,6 @@ export class AppComponent {
     return result;
   }
 
-  @ViewChild(ButterflyComponent) butterfly?: ButterflyComponent;
 
   async ngOnInit() {
     let user = await this.loadService.currentUser;
