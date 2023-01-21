@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { ERC20 } from './erc20.model';
+import { ERC20 } from 'thred-core';
 
 @Pipe({
   name: 'tokenFilter'

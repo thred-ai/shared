@@ -1,4 +1,4 @@
-<div
+<!-- <div
   class="w-100 bar border-pink border-top border-2"
   style="min-height: 57.5vh; padding-top: 10vh; padding-bottom: 10vh"
 >
@@ -16,18 +16,10 @@
     </span>
   </div>
 
-  <!-- <app-butterfly
-    *ngIf="!isLocation(['/auth', '/edit', '/store/'])"
-    [movable]="true"
-  ></app-butterfly> -->
+
 
   <router-outlet></router-outlet>
-  <!-- (activate)="onActivate($event)"
-  [ngRouterOutletComm]="{
-    type: 'parent',
-    sender: sendToChildEmitter,
-    receiver: onChildEvent.bind(this)
-  }" -->
+
 </div>
 <mat-toolbar
   class="toolbarNav w-100 shadow border-top bar"
@@ -46,4 +38,7 @@
       <span>{{ tab.name }}</span>
     </button>
   </ng-container>
-</mat-toolbar>
+</mat-toolbar> -->
+
+
+<router-outlet></router-outlet>

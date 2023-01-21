@@ -13,7 +13,6 @@ import { CommonModule } from '@angular/common';
 import { AngularFireModule } from '@angular/fire/compat';
 import { environment } from '../environments/environment';
 // import { Globals } from './globals';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
@@ -66,50 +65,40 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { NgxCurrencyModule } from 'ngx-currency';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { HomeComponent } from './home/home.component';
-import { AccountComponent } from './account/account.component';
 import { StoreComponent } from './store/store.component';
-import { AuthComponent } from './auth/auth.component';
-import { ButterflyComponent } from './butterfly/butterfly.component';
 import { AddressEnsLookupPipe } from './address-ens-lookup.pipe';
-import { AddressPipe } from './address.pipe';
 import { AddressValidatePipe } from './address-validate.pipe';
-import { FormatEtherPipe } from './format-ether.pipe';
 import { NameEnsLookupPipe } from './name-ens-lookup.pipe';
-import { TypeNumberPipe } from './type-number.pipe';
 import { IsLocationPipe } from './is-location.pipe';
 import { ProfileComponent } from './profile/profile.component';
-import { SafeUrlPipe } from './safe-url.pipe';
 import {ClipboardModule} from '@angular/cdk/clipboard';
 import { ItemComponent } from './item/item.component';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { NetworkComponent } from './network/network.component';
 import { FirstLetterPipe } from './first-letter.pipe';
-import { NumValuePipe } from './num-value.pipe';
+import { WalletViewComponent } from './wallet-view/wallet-view.component';
+import { ThredCoreModule } from 'thred-core';
+import { SafeUrlPipe } from './safe-url.pipe';
 import { TokenFilterPipe } from './token-filter.pipe';
+import { NumValuePipe } from './num-value.pipe';
 
 @NgModule({
   declarations: [
     AppComponent,
-    HomeComponent,
-    AccountComponent,
     ItemComponent,
     StoreComponent,
-    AuthComponent,
-    ButterflyComponent,
+    // ButterflyComponent,
     ProfileComponent,
+    WalletViewComponent,
     AddressEnsLookupPipe,
-    AddressPipe,
     AddressValidatePipe,
-    FormatEtherPipe,
     NameEnsLookupPipe,
-    TypeNumberPipe,
     IsLocationPipe,
-    SafeUrlPipe,
     NetworkComponent,
     FirstLetterPipe,
     NumValuePipe,
-    TokenFilterPipe,
+    SafeUrlPipe,
+    TokenFilterPipe
   ],
   imports: [
     CommonModule,
@@ -122,7 +111,6 @@ import { TokenFilterPipe } from './token-filter.pipe';
     MatToolbarModule,
     MatIconModule,
     AngularFireModule.initializeApp(environment.firebase),
-    NgbModule,
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
@@ -144,7 +132,6 @@ import { TokenFilterPipe } from './token-filter.pipe';
     VgOverlayPlayModule,
     LazyLoadImageModule,
     MatSidenavModule,
-    NgbModule,
     MatTabsModule,
     MatTableModule,
     MatNativeDateModule,
@@ -167,6 +154,7 @@ import { TokenFilterPipe } from './token-filter.pipe';
     MdbValidationModule,
     MatDatepickerModule,
     MatPaginatorModule,
+    ThredCoreModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [

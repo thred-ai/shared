@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ethers } from 'ethers';
+import { Chain, ERC20 } from 'thred-core';
 import { AppComponent } from '../app.component';
-import { Chain } from '../chain.model';
-import { ERC20 } from '../erc20.model';
 import { LoadService } from '../load.service';
 
 @Component({
@@ -58,7 +57,6 @@ export class NetworkComponent implements OnInit {
           signedInUser!,
           (tokens) => {
             if (tokens) {
-              console.log(JSON.stringify(tokens));
               this.tokens = this.tokens?.concat(tokens) ?? [];
             }
             this.loading = false;

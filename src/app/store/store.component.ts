@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ethers } from 'ethers';
+import { App } from 'thred-core';
 import { AppComponent } from '../app.component';
-import { App } from '../app.model';
 import { LoadService } from '../load.service';
 
 @Component({
@@ -21,12 +21,12 @@ export class StoreComponent implements OnInit {
     if (signedInUser) {
       this.loading = true;
       await this.loadService.initProviders();
-      this.loadService.getNewItems((apps) => {
-        setTimeout(() => {
-          this.loading = false;
-          this.apps = apps ?? [];
-        }, 500);
-      });
+      // this.loadService.getNewItems((apps) => {
+      //   setTimeout(() => {
+      //     this.loading = false;
+      //     this.apps = apps ?? [];
+      //   }, 500);
+      // });
     } else {
       this.root.routeToAuth();
     }

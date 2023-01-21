@@ -1,9 +1,9 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { User } from 'thred-core';
 import { AppComponent } from '../app.component';
 import { LoadService } from '../load.service';
-import { User } from '../user.model';
 
 @Component({
   selector: 'app-profile',
@@ -44,7 +44,6 @@ export class ProfileComponent implements OnInit {
 
 
   async fileChangeEvent(event: any): Promise<void> {
-    console.log(event);
 
     let file = event.target.files[0];
 
@@ -64,7 +63,6 @@ export class ProfileComponent implements OnInit {
 
     reader.readAsDataURL(blob);
 
-    console.log(file);
   }
 
   save() {

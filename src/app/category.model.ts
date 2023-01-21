@@ -1,4 +1,4 @@
-import { App } from "./app.model"
+import { App } from "thred-core"
 
 
 export class Category{

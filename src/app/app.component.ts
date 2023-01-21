@@ -13,26 +13,26 @@ import { LoadService } from './load.service';
 export class AppComponent {
   title = '';
   signedIn?: Boolean;
-  uid?: string
+  uid?: string;
 
   tabs = [
     {
       name: 'Discover',
       icon: 'search',
       link: '/store',
-      hide: "0x54Da21443C8D97B3aac5067Fd0B21c359D343Ea2"
+      hide: '0x54Da21443C8D97B3aac5067Fd0B21c359D343Ea2',
     },
     {
       name: 'My Apps',
       icon: 'apps',
       link: '/home',
-      hide: "0x54Da21443C8D97B3aac5067Fd0B21c359D343Ea2",
+      hide: '0x54Da21443C8D97B3aac5067Fd0B21c359D343Ea2',
     },
     {
       name: 'Account',
       icon: 'account_balance_wallet',
       link: '/account',
-      hide: null
+      hide: null,
     },
   ];
 
@@ -53,28 +53,52 @@ export class AppComponent {
   @ViewChild(ButterflyComponent) butterfly?: ButterflyComponent;
 
   async ngOnInit() {
+    let user = await this.loadService.currentUser;
+
+    if (user){
+      console.log("USER -- ")
+
+      console.log(user.uid)
+      this.loadService.getUserInfo(user.uid, false, false, user => {
+        console.log("APP LOAD -- ")
+      console.log(JSON.stringify(user))
+        this.loadService.loadedUser.next(user ?? null);
+      })
+    }
+    else {
+      console.log("NO USER")
+    }
+
+    this.loadService.loadedUser.subscribe((user) => {
+      console.log("APP -- ")
+      console.log(JSON.stringify(user))
+      this.uid = user?.id;
+      // if (!user){
+      //   this.routeToAuth()
+      // }
+    });
     document.body.classList.add('bar');
 
-    if ((window as any).newInstance ?? false) {
-      this.butterfly?.beginFlyAnimation();
-    }
+    // if ((window as any).newInstance ?? false) {
+    //   this.butterfly?.beginFlyAnimation();
+    // }
   }
 
-  async initApp(title = "App") {
-
-
+  async initApp(title = 'App') {
     let url =
       window.location.pathname == '/' ? '/home' : window.location.pathname;
 
     this.title = this.tabs.find((tab) => tab.link == url)?.name ?? title;
-    let uid = (await this.loadService.currentUser)?.uid
-    this.signedIn = uid != undefined;
-    this.uid = uid
+    this.signedIn = this.uid != undefined;
   }
 
   isLocation(locations: string[]) {
     return (
-      locations.find((loc) => loc == window.location.pathname || window.location.pathname.includes(`${loc}`)) != undefined
+      locations.find(
+        (loc) =>
+          loc == window.location.pathname ||
+          window.location.pathname.includes(`${loc}`)
+      ) != undefined
     );
   }
 
@@ -100,5 +124,12 @@ export class AppComponent {
 
   routeToNetwork(id: number) {
     this._router.navigateByUrl(`/account/${id}`); //
+  }
+
+  handleRefresh(event: any) {
+    setTimeout(() => {
+      // Any calls to load data go here
+      event.target.complete();
+    }, 2000);
   }
 }

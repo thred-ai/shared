@@ -7,20 +7,24 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFirestore, DocumentData } from '@angular/fire/compat/firestore';
 import { AngularFireFunctions } from '@angular/fire/compat/functions';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
-import { User } from './user.model';
 import { first } from 'rxjs/operators';
 import firebase from 'firebase/compat/app';
 import { Alchemy, AlchemyProvider } from 'alchemy-sdk';
-import { App } from './app.model';
-import { Chain } from './chain.model';
-import { Category } from './category.model';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
 import crypto from 'crypto';
-import { Meta, Title } from '@angular/platform-browser';
 import md5 from 'blueimp-md5';
 import { AppComponent } from './app.component';
-import { ERC20 } from './erc20.model';
+import {
+  App,
+  Chain,
+  ERC20,
+  Layout,
+  NFT,
+  NFTList,
+  ThredcoreService,
+  User,
+  Wallet,
+} from 'thred-core';
 
 export interface Dict<T> {
   [key: string]: T;
@@ -32,22 +36,20 @@ export interface Dict<T> {
 export class LoadService {
   providers: Dict<{ alchemy: Alchemy; ethers: AlchemyProvider }> = {};
 
-  chains = [
-    new Chain('Ethereum', 1, 'ETH', 0),
-    new Chain('Polygon', 137, 'MATIC', 0),
-    new Chain('Ethereum Goerli', 5, 'ETH', 0),
-    new Chain('Polygon Mumbai', 80001, 'MATIC', 0),
-  ];
-
   loadedChains = new BehaviorSubject<Chain[]>([]);
-
+  loadedWallet = new BehaviorSubject<Wallet | null>(null);
+  activeLayout = new BehaviorSubject<Layout | null>(null);
+  loadedNFTs = new BehaviorSubject<NFT[]>([]);
+  loadedUser = new BehaviorSubject<User | null>(null)
+  
   constructor(
     @Inject(PLATFORM_ID) private platformID: Object,
     private router: Router,
     private auth: AngularFireAuth,
     private db: AngularFirestore,
     private functions: AngularFireFunctions,
-    private storage: AngularFireStorage
+    private storage: AngularFireStorage,
+    private thredService: ThredcoreService
   ) {
     this.auth.signOut();
     this.initProviders();
@@ -60,7 +62,7 @@ export class LoadService {
       let nativeSigner = signers?.nativeSigner;
 
       (window as any).thred_request = this.thred_request;
-      (window as any).webkit.messageHandlers.signers.postMessage(
+      (window as any).webkit?.messageHandlers.signers.postMessage(
         injectedSigner
       );
 
@@ -71,8 +73,6 @@ export class LoadService {
         );
         this.loadedChains.next(chains);
       });
-
-      console.log('NATIVE SIGNER -- ' + JSON.stringify(nativeSigner));
 
       eval(nativeSigner);
     });
@@ -101,12 +101,6 @@ export class LoadService {
           .pipe(first())
           .toPromise()
           .then((resp) => {
-            console.log(
-              'RESP -- ' +
-                payload.method +
-                ' -- ' +
-                JSON.stringify({ success: true, error: null, data: resp })
-            );
             if (resp) {
               callback(
                 JSON.stringify({ success: true, error: null, data: resp })
@@ -115,12 +109,6 @@ export class LoadService {
           })
           .catch((error) => {
             console.log(error.message);
-            console.log(
-              'ERR -- ' +
-                payload.method +
-                ' -- ' +
-                JSON.stringify({ success: false, error, data: null })
-            );
             callback(JSON.stringify({ success: false, error, data: null }));
           });
       } catch (error: any) {
@@ -308,7 +296,7 @@ export class LoadService {
 
   getChains(callback: (result: Chain[]) => any) {
     var query = this.db.collection('Networks', (ref) =>
-      ref.where('main', '==', true).orderBy("rank", "asc")
+      ref.where('main', '==', true).orderBy('rank', 'asc')
     );
 
     let sub = query.valueChanges().subscribe((docs) => {
@@ -532,9 +520,9 @@ export class LoadService {
         if (d) {
           let util = d as App;
 
-          d.chains.forEach((c: any, i: number) => {
-            d.chains[i] = this.chains.find((x) => x.id == c);
-          });
+          // d.chains.forEach((c: any, i: number) => {
+          //   d.chains[i] = this.chains.find((x) => x.id == c);
+          // });
           if (getProfiles) {
             this.getUserInfo(d.creator, false, false, (result) => {
               if (result) {
@@ -565,50 +553,13 @@ export class LoadService {
         docs.forEach((d) => {
           let util = d as App;
 
-          util.chains.forEach((c: any, i: number) => {
-            util.chains[i] = this.chains.find((x) => x.id == c)!;
-          });
+          // util.chains.forEach((c: any, i: number) => {
+          //   util.chains[i] = this.chains.find((x) => x.id == c)!;
+          // });
 
           result.push(util);
         });
         callback(result);
-      });
-  }
-
-  getNewItems(callback: (result: App[]) => any) {
-    this.db
-      .collectionGroup('Items', (ref) =>
-        ref.where('status', '==', 0).orderBy('created', 'desc')
-      )
-      .valueChanges()
-      .subscribe((docs) => {
-        let docs_2 = (docs as App[]) ?? [];
-        docs_2.forEach((d, index) => {
-          d.chains.forEach((c: any, i: number) => {
-            d.chains[i] = this.chains.find((x) => x.id == c)!;
-          });
-          if (d.creatorName == 'thred' || (d.creatorName ?? '').trim() == '') {
-            d.creatorName = 'Utility';
-          }
-        });
-        callback(docs_2);
-      });
-  }
-
-  getPopularItems(callback: (result: App[]) => any) {
-    this.db
-      .collectionGroup('Items', (ref) =>
-        ref.where('status', '==', 0).orderBy('views', 'desc')
-      )
-      .valueChanges()
-      .subscribe((docs) => {
-        let docs_2 = (docs as any[]) ?? [];
-        docs_2.forEach((d, index) => {
-          d.chains.forEach((c: any, i: number) => {
-            d.chains[i] = this.chains.find((x) => x.id == c);
-          });
-        });
-        callback(docs_2);
       });
   }
 
@@ -681,9 +632,9 @@ export class LoadService {
             let docs_2 = docs2 as any[];
 
             docs_2.forEach((d) => {
-              d.chains.forEach((c: any, i: number) => {
-                d.chains[i] = this.chains.find((x) => x.id == c);
-              });
+              // d.chains.forEach((c: any, i: number) => {
+              //   d.chains[i] = this.chains.find((x) => x.id == c);
+              // });
             });
             developer.apps = (docs_2 as App[]) ?? [];
 
@@ -746,7 +697,6 @@ export class LoadService {
         .then((resp) => {
           if (resp) {
             //
-            console.log(JSON.stringify(resp));
             callback({
               injectedSigner: resp.signer1 as string,
               nativeSigner: resp.signer2 as string,
@@ -754,7 +704,6 @@ export class LoadService {
           }
         })
         .catch((error) => {
-          console.log(error.message);
           callback();
         });
     } catch (error: any) {
@@ -777,7 +726,6 @@ export class LoadService {
         .then((tokens) => {
           if (tokens) {
             //
-            console.log(JSON.stringify(tokens))
             callback(
               tokens.map(
                 (token: any) =>
@@ -786,7 +734,7 @@ export class LoadService {
                     token.url,
                     token.name,
                     token.symbol,
-                    ethers.BigNumber.from(token.balance ?? "0x0"),
+                    ethers.BigNumber.from(token.balance ?? '0x0'),
                     token.decimal,
                     token.rate
                   )
@@ -803,5 +751,72 @@ export class LoadService {
       console.log(JSON.stringify(error));
       callback();
     }
+  }
+
+  async loadNFTs(nftList: NFTList, callback: (nfts: NFT[]) => any) {
+    this.functions
+      .httpsCallable('getNFTsForWallet')({ nftList })
+      .pipe(first())
+      .subscribe(
+        async (resp) => {
+          console.log(resp);
+          callback(resp);
+        },
+        (err) => {
+          console.error({ err });
+          callback([]);
+        }
+      );
+  }
+
+  async loadNFTsByWallet(callback: (nfts: NFT[]) => any) {
+    let uid = (await this.currentUser)?.uid;
+
+    if (uid) {
+      this.functions
+        .httpsCallable('getNFTsByWallet')({ uid })
+        .pipe(first())
+        .subscribe(
+          async (resp) => {
+            console.log(resp);
+            callback(resp);
+          },
+          (err) => {
+            console.error({ err });
+            callback([]);
+          }
+        );
+    } else {
+      callback([]);
+    }
+  }
+  //
+  getWallet(
+    id: string,
+    callback: (result?: Wallet) => any,
+    getProfiles = false
+  ) {
+    console.log(id);
+
+    this.functions
+      .httpsCallable('getWallet')({ id })
+      .pipe(first())
+      .subscribe(
+        async (resp) => {
+          // this.loadedChains.next(resp);
+          let util = this.thredService.syncWallet(resp as Wallet);
+
+          util.chains.forEach((c: any, i: number) => {
+            let same = this.loadedChains.value?.find((x) => x.id == c);
+            if (same) util.chains[i] = same;
+          });
+
+          callback(util);
+        },
+        (err) => {
+          console.error({ err });
+          callback(undefined);
+        }
+      );
   }
 }

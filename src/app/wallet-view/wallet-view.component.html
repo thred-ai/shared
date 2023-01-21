@@ -1,0 +1,27 @@
+<div class="w-100" style="height: 100vh" *ngIf="activeWallet && activeLayout">
+  <ng-container *ngIf="signedIn; else auth">
+    <thred-page
+      *ngIf="activePage"
+      [editable]="false"
+      [layout]="activeLayout"
+      [currentPage]="activePage"
+      [defaultItems]="loadedNFTs"
+      (pageChanged)="pageChanged($event)"
+      [accountDetails]="activePage.page.type == 2 ? {user} : undefined"
+      (refreshed)="reload()"
+    >
+    </thred-page>
+  </ng-container>
+  <ng-template #auth>
+  
+    <thred-page
+      *ngIf="!loading"
+      [editable]="false"
+      [layout]="activeLayout"
+      [currentPage]="{ page: activeLayout.authPage, index: 0 }"
+      [authDetails]="authDetails"
+      (authUpdated)="parseAuth($event)"
+    >
+    </thred-page>
+  </ng-template>
+</div>

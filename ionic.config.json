@@ -1,0 +1,10 @@
+{
+  "projects": {
+    "ThredMobile": {
+      "name": "ThredMobile",
+      "integrations": {},
+      "type": "angular"
+    }
+  },
+  "defaultProject": "ThredMobile"
+}

@@ -10,13 +10,11 @@ import { Meta } from '@angular/platform-browser';
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { ethers } from 'ethers';
 import { filter, map } from 'rxjs/operators';
+import { App } from 'thred-core';
 import { AppComponent } from '../app.component';
-import { App } from '../app.model';
 import { Category } from '../category.model';
-import { Chain } from '../chain.model';
 import { LoadService } from '../load.service';
 import { NameEnsLookupPipe } from '../name-ens-lookup.pipe';
-import { Signature } from '../signature.model';
 
 @Component({
   selector: 'app-item',
@@ -177,7 +175,6 @@ export class ItemComponent implements OnInit, OnDestroy {
 
     let util = app.signatures.find((s) => s.chainId == chainId);
 
-    console.log(util);
 
     this.loading = 2
 
