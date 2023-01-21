@@ -4,9 +4,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTabChangeEvent } from '@angular/material/tabs';
 import { ethers } from 'ethers';
+import { Chain } from 'thred-core';
 import { AppComponent } from '../app.component';
 import { ButterflyComponent } from '../butterfly/butterfly.component';
-import { Chain } from '../chain.model';
 import { LoadService } from '../load.service';
 import { ProfileComponent } from '../profile/profile.component';
 import { User } from '../user.model';
@@ -23,7 +23,7 @@ export class AccountComponent implements OnInit {
     private clipboard: Clipboard,
     private _snackBar: MatSnackBar
   ) {}
-
+//
   provider?: ethers.providers.Web3Provider;
   user?: User;
   balance = 0
@@ -36,7 +36,6 @@ export class AccountComponent implements OnInit {
 
     let signedInUser = await this.loadService.currentUser;
 
-    console.log("USER -- " + JSON.stringify(signedInUser?.uid))
     if (signedInUser && signedInUser.uid) {
       this.root.initApp();
       // this.root.butterfly?.beginFlyAnimation();
@@ -51,34 +50,33 @@ export class AccountComponent implements OnInit {
         ).getTime();
         await this.loadService.initProviders();
 
-        this.loadService.loadedChains.subscribe(async (chains) => {
-          await Promise.all(
-            chains.map(async (c) => {
-              this.chains.push({
-                chain: c,
-                balance: ethers.BigNumber.from('0'),
-              });
-              if (!this.provider) {
-                return; //
-              }
-              let balance = ethers.BigNumber.from(
-                await (window as any).ethereum.request({
-                  method: 'eth_getBalance',
-                  params: [this.address, 'latest'],
-                  chainId: `${c.id}`,
-                })
-              );
-              if (balance) {
-                let index = this.chains.findIndex((b) => b.chain.id == c.id);
-                if (index > -1) {
-                  this.chains[index].balance = balance;
-                  this.balance += (c.rate * Number(ethers.utils.formatEther(balance)))
-                }
-              }
-              console.log(`${c.name} -- ${balance?.toNumber()}`);
-            })
-          );
-        });
+        // this.loadService.loadedChains.subscribe(async (chains) => {
+        //   await Promise.all(
+        //     chains.map(async (c) => {
+        //       this.chains.push({
+        //         chain: c,
+        //         balance: ethers.BigNumber.from('0'),
+        //       });
+        //       if (!this.provider) {
+        //         return; //
+        //       }
+        //       let balance = ethers.BigNumber.from(
+        //         await (window as any).ethereum.request({
+        //           method: 'eth_getBalance',
+        //           params: [this.address, 'latest'],
+        //           chainId: `${c.id}`,
+        //         })
+        //       );
+        //       if (balance) {
+        //         let index = this.chains.findIndex((b) => b.chain.id == c.id);
+        //         if (index > -1) {
+        //           this.chains[index].balance = balance;
+        //           this.balance += (c.rate * Number(ethers.utils.formatEther(balance)))
+        //         }
+        //       }
+        //     })
+        //   );
+        // });
 
         this.loadService.getUserInfo(signedInUser.uid, false, false, (user) => {
           this.user = user;
@@ -92,7 +90,6 @@ export class AccountComponent implements OnInit {
       this.root.routeToAuth();
     }
 
-    // console.log(await this.provider?.getBalance(await (this.provider.getSigner()).getAddress()))
   }
 
   editProfile() {
