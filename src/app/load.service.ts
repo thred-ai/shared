@@ -40,8 +40,8 @@ export class LoadService {
   loadedWallet = new BehaviorSubject<Wallet | null>(null);
   activeLayout = new BehaviorSubject<Layout | null>(null);
   loadedNFTs = new BehaviorSubject<NFT[]>([]);
-  loadedUser = new BehaviorSubject<User | null>(null)
-  
+  loadedUser = new BehaviorSubject<User | null>(null);
+
   constructor(
     @Inject(PLATFORM_ID) private platformID: Object,
     private router: Router,
@@ -355,7 +355,7 @@ export class LoadService {
     try {
       await this.db.collection('Users').doc(uid).set(userInfo, { merge: true });
 
-      callback(new User(name, uid, [], 0, url, email));
+      callback(new User(name, uid, [], 0, url, email, data.registeredWallets));
     } catch (error) {
       callback(undefined);
     }
@@ -392,7 +392,8 @@ export class LoadService {
                       [],
                       userData.joined,
                       userData.url,
-                      userData.email
+                      userData.email,
+                      userData.registeredWallets
                     );
                     callback(user);
                   })
@@ -437,7 +438,8 @@ export class LoadService {
                       [],
                       userData.joined,
                       userData.url,
-                      userData.email
+                      userData.email,
+                      userData.registeredWallets
                     );
                     callback(user);
                   })
@@ -612,13 +614,22 @@ export class LoadService {
         let joined = doc['joined'] as number;
         let uid = doc['uid'] as string;
         let url = doc['url'] as string;
+        let registeredWallets = doc['registeredWallets'] as string[];
         let myUID = (await this.currentUser)?.uid;
         if (isPlatformBrowser(this.platformID) && uid == myUID) {
           localStorage['url'] = url;
           localStorage['name'] = name;
           localStorage['email'] = email;
         }
-        let developer = new User(name, uid, [], joined, url, email);
+        let developer = new User(
+          name,
+          uid,
+          [],
+          joined,
+          url,
+          email,
+          registeredWallets
+        );
 
         if (fetchItems) {
           let q = this.db.collection(`Users/${uid}/Items`);

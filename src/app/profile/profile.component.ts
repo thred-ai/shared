@@ -77,7 +77,7 @@ export class ProfileComponent implements OnInit {
       let uid = (window as any).user?.id;
       let email = this.profileForm.controls['email'].value;
 
-      let user = new User(name, uid, [], 0, url, email)
+      let user = new User(name, uid, [], 0, url, email, [])
       this.loadService.saveUserInfo(user, file, uploadImage, (result) => {
         this.loading = false;
         if (result) {
