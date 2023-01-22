@@ -25,7 +25,7 @@
         *ngIf="chain"
       >
         {{
-          ((balance | formatEther | numValue) ?? 0) * chain.rate
+          ((balance | formatEther | numValue) ?? 0) * chain.rates["usd"]
             | currency: "USD":"symbol"
         }}
       </div>
@@ -97,8 +97,8 @@
               *ngIf="token.balance | formatEther as balance"
             >
               {{
-                ((balance | numValue) ?? 0) > 0 && token.rate > 0
-                  ? (((balance | numValue) ?? 0) * token.rate
+                ((balance | numValue) ?? 0) > 0 && token.rates["usd"] > 0
+                  ? (((balance | numValue) ?? 0) * token.rates["usd"]
                     | currency: "USD":"symbol")
                   : ("0" | currency: "USD":"symbol")
               }}

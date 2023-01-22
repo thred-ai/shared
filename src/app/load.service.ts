@@ -310,7 +310,7 @@ export class LoadService {
             d['name'] as string,
             d['id'] as number,
             d['symbol'] as string,
-            d['usd'] as number,
+            d['price'] as Dict<number>,
             !(d['main'] as boolean)
           );
           chains.push(chain);
@@ -736,7 +736,7 @@ export class LoadService {
                     token.symbol,
                     ethers.BigNumber.from(token.balance ?? '0x0'),
                     token.decimal,
-                    token.rate
+                    token.price
                   )
               ) as ERC20[]
             );

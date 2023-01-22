@@ -46,7 +46,7 @@ export class NetworkComponent implements OnInit {
               this.chain?.currency,
               balance,
               18,
-              this.chain?.rate
+              this.chain?.rates
             ),
           ];
           this.balance = balance;
