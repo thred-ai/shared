@@ -77,10 +77,10 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { NetworkComponent } from './network/network.component';
 import { FirstLetterPipe } from './first-letter.pipe';
 import { WalletViewComponent } from './wallet-view/wallet-view.component';
-import { ThredCoreModule } from 'thred-core';
 import { SafeUrlPipe } from './safe-url.pipe';
 import { TokenFilterPipe } from './token-filter.pipe';
 import { NumValuePipe } from './num-value.pipe';
+import { ThredCoreModule } from 'thred-core';
 
 @NgModule({
   declarations: [

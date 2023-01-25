@@ -21,7 +21,7 @@ import {
   Layout,
   NFT,
   NFTList,
-  ThredcoreService,
+  ThredCoreService,
   User,
   Wallet,
 } from 'thred-core';
@@ -49,7 +49,7 @@ export class LoadService {
     private db: AngularFirestore,
     private functions: AngularFireFunctions,
     private storage: AngularFireStorage,
-    private thredService: ThredcoreService
+    private thredService: ThredCoreService
   ) {
     this.auth.signOut();
     this.initProviders();
@@ -66,18 +66,20 @@ export class LoadService {
         injectedSigner
       );
 
-      this.getChains((chains) => {
-        (window as any).thred_chains = JSON.stringify(chains);
-        (window as any).webkit?.messageHandlers?.chains.postMessage(
-          JSON.stringify(chains)
-        );
-        this.loadedChains.next(chains);
-      });
-
       eval(nativeSigner);
     });
 
     this.setRequest();
+  }
+
+  installChains(getBalances = false) {
+    this.getChains(getBalances, (chains) => {
+      (window as any).thred_chains = JSON.stringify(chains);
+      (window as any).webkit?.messageHandlers?.chains.postMessage(
+        JSON.stringify(chains)
+      );
+      this.loadedChains.next(chains);
+    });
   }
 
   decodeHex(hex: string) {
@@ -294,32 +296,20 @@ export class LoadService {
       });
   }
 
-  getChains(callback: (result: Chain[]) => any) {
-    var query = this.db.collection('Networks', (ref) =>
-      ref.where('main', '==', true).orderBy('rank', 'asc')
-    );
-
-    let sub = query.valueChanges().subscribe((docs) => {
-      sub.unsubscribe();
-      let doc = docs as DocumentData[];
-
-      if (doc) {
-        var chains: Chain[] = [];
-        doc.forEach((d) => {
-          let chain = new Chain(
-            d['name'] as string,
-            d['id'] as number,
-            d['symbol'] as string,
-            d['price'] as Dict<number>,
-            !(d['main'] as boolean)
-          );
-          chains.push(chain);
-        });
+  async getChains(getBalances = false, callback: (result: Chain[]) => any) {
+    console.log('USER -- ' + JSON.stringify((await this.currentUser)?.uid));
+    let thred = (window as any)?.thred;
+    this.functions
+      .httpsCallable('getChainsForWallet')({
+        id: thred ? await thred() : undefined,
+        getBalances,
+      })
+      .pipe(first())
+      .subscribe(async (resp) => {
+        console.log('RESP -- ' + JSON.stringify(resp));
+        let chains = this.thredService.syncChains(resp);
         callback(chains);
-      } else {
-        callback([]);
-      }
-    });
+      });
   }
 
   async saveUserInfo(
@@ -815,12 +805,11 @@ export class LoadService {
       .subscribe(
         async (resp) => {
           // this.loadedChains.next(resp);
-          let util = this.thredService.syncWallet(resp as Wallet);
-
-          util.chains.forEach((c: any, i: number) => {
-            let same = this.loadedChains.value?.find((x) => x.id == c);
-            if (same) util.chains[i] = same;
-          });
+          let util = this.thredService.syncWallet(
+            resp,
+            this.loadedChains.value
+          );
+          console.log(util);
 
           callback(util);
         },

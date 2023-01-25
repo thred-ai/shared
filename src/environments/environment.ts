@@ -6,6 +6,7 @@ import { Network } from 'alchemy-sdk';
 export const environment = {
   production: false,
 
+  
   firebase: {
     apiKey: 'AIzaSyCCV1HUWCeM0kaSVM7FcpDyHrTanse6BAk',
     authDomain: 'thred-protocol.firebaseapp.com',

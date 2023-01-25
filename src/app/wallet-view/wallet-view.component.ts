@@ -305,17 +305,23 @@ export class WalletViewComponent implements OnInit {
 
     this.loadService.loadedChains.subscribe((chains) => {
       this.chains = chains ?? [];
-      if (chains.length > 0) {
+      console.log(this.chains)
+      if (chains.length > 0 && this.wallet == undefined) {
         this.loadService.getWallet(id, (wallet) => {
           if (wallet) {
             this.loadService.loadedWallet.next(wallet);
           }
         });
       }
+      else{
+        this.loadService.loadedWallet.next(this.wallet);
+      }
     });
     this.loadService.loadedWallet.subscribe((wallet) => {
       if (wallet) {
         this.wallet = wallet;
+        console.log(JSON.stringify(wallet.chains))
+
         this.loadService.loadNFTsByWallet((nfts) => {
           this.loadService.loadedNFTs.next(nfts ?? []);
         });
@@ -326,9 +332,13 @@ export class WalletViewComponent implements OnInit {
     });
     this.loadService.loadedUser.subscribe(async (user) => {
       this.signedIn = user != null;
-      console.log("WALLET -- ")
-      console.log(JSON.stringify(user))
       this.user = user ?? undefined;
+      if (user){
+        this.loadService.installChains(true)
+      }
+      else{
+        this.loadService.installChains(false)
+      }
     });
   }
 

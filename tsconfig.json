@@ -15,17 +15,20 @@
     "downlevelIteration": true,
     "experimentalDecorators": true,
     "moduleResolution": "node",
-    "allowSyntheticDefaultImports":true,
+    "allowSyntheticDefaultImports": true,
     "importHelpers": true,
     "target": "es2017",
     "module": "es2020",
-    "lib": [
-      "es2020",
-      "dom"
-    ],
+    "lib": ["es2020", "dom"],
     "paths": {
-      "crypto":["node_modules/crypto-browserify"],
-      "stream":["node_modules/stream-browserify"]
+      "crypto": ["node_modules/crypto-browserify"],
+      "stream": [
+        "node_modules/stream-browserify"
+      ],
+      "thred-core": [
+        "dist/thredcore/thredcore",
+        "dist/thredcore"
+      ]
     }
   },
   "angularCompilerOptions": {

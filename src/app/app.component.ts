@@ -54,12 +54,7 @@ export class AppComponent {
     let user = await this.loadService.currentUser;
 
     if (user){
-      console.log("USER -- ")
-
-      console.log(user.uid)
       this.loadService.getUserInfo(user.uid, false, false, user => {
-        console.log("APP LOAD -- ")
-      console.log(JSON.stringify(user))
         this.loadService.loadedUser.next(user ?? null);
       })
     }
@@ -68,8 +63,6 @@ export class AppComponent {
     }
 
     this.loadService.loadedUser.subscribe((user) => {
-      console.log("APP -- ")
-      console.log(JSON.stringify(user))
       this.uid = user?.id;
       // if (!user){
       //   this.routeToAuth()

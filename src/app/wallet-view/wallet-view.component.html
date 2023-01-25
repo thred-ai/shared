@@ -5,7 +5,7 @@
       [editable]="false"
       [layout]="activeLayout"
       [currentPage]="activePage"
-      [defaultItems]="{'6': loadedNFTs}"
+      [defaultItems]="{'6': loadedNFTs, '7': chains ?? []}"
       (pageChanged)="pageChanged($event)"
       [accountDetails]="activePage.page.type == 2 ? {user} : undefined"
       (refreshed)="reload()"
