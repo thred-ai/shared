@@ -65,14 +65,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { NgxCurrencyModule } from 'ngx-currency';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { StoreComponent } from './store/store.component';
 import { AddressEnsLookupPipe } from './address-ens-lookup.pipe';
 import { AddressValidatePipe } from './address-validate.pipe';
 import { NameEnsLookupPipe } from './name-ens-lookup.pipe';
 import { IsLocationPipe } from './is-location.pipe';
 import { ProfileComponent } from './profile/profile.component';
 import {ClipboardModule} from '@angular/cdk/clipboard';
-import { ItemComponent } from './item/item.component';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { NetworkComponent } from './network/network.component';
 import { FirstLetterPipe } from './first-letter.pipe';
@@ -85,8 +83,6 @@ import { ThredCoreModule } from 'thred-core';
 @NgModule({
   declarations: [
     AppComponent,
-    ItemComponent,
-    StoreComponent,
     // ButterflyComponent,
     ProfileComponent,
     WalletViewComponent,

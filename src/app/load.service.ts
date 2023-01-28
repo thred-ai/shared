@@ -49,7 +49,7 @@ export class LoadService {
     private db: AngularFirestore,
     private functions: AngularFireFunctions,
     private storage: AngularFireStorage,
-    private thredService: ThredCoreService
+    public thredService: ThredCoreService
   ) {
     this.auth.signOut();
     this.initProviders();
@@ -98,12 +98,15 @@ export class LoadService {
       try {
         let payload = JSON.parse(data);
         payload.id = await (window as any).thred();
+        console.log(JSON.stringify(payload))
         this.functions
           .httpsCallable('transact')(payload)
           .pipe(first())
           .toPromise()
-          .then((resp) => {
+          .then(async (resp) => {
             if (resp) {
+              console.log(JSON.stringify(resp))
+              
               callback(
                 JSON.stringify({ success: true, error: null, data: resp })
               );
@@ -306,7 +309,6 @@ export class LoadService {
       })
       .pipe(first())
       .subscribe(async (resp) => {
-        console.log('RESP -- ' + JSON.stringify(resp));
         let chains = this.thredService.syncChains(resp);
         callback(chains);
       });
@@ -453,50 +455,50 @@ export class LoadService {
 
   filteredSearch: BehaviorSubject<any> = new BehaviorSubject([]);
 
-  search(term: string) {
-    let sub2 = this.db
-      .collectionGroup(`Items`, (ref) =>
-        ref
-          .where('search_name', '>=', term)
-          .where('search_name', '<=', term + '\uf8ff')
-          .limit(3)
-      )
-      .valueChanges()
-      .subscribe((docs2) => {
-        sub2.unsubscribe();
-        let returnVal: any[] = [];
+  // search(term: string) {
+  //   let sub2 = this.db
+  //     .collectionGroup(`Items`, (ref) =>
+  //       ref
+  //         .where('search_name', '>=', term)
+  //         .where('search_name', '<=', term + '\uf8ff')
+  //         .limit(3)
+  //     )
+  //     .valueChanges()
+  //     .subscribe((docs2) => {
+  //       sub2.unsubscribe();
+  //       let returnVal: any[] = [];
 
-        (docs2 as App[])?.forEach((d: App) => {
-          returnVal.push({
-            name: d.name,
-            type: 1,
-            img: d.displayUrls[0],
-            id: d.id,
-          });
-        });
+  //       (docs2 as App[])?.forEach((d: App) => {
+  //         returnVal.push({
+  //           name: d.name,
+  //           type: 1,
+  //           img: d.displayUrls[0],
+  //           id: d.id,
+  //         });
+  //       });
 
-        let sub3 = this.db
-          .collectionGroup(`Users`, (ref) =>
-            ref
-              .where('search_name', '>=', term)
-              .where('search_name', '<=', term + '\uf8ff')
-              .limit(3)
-          )
-          .valueChanges()
-          .subscribe((docs3) => {
-            sub3.unsubscribe();
-            (docs3 as any[])?.forEach((d: any) => {
-              returnVal.push({
-                name: d.name,
-                type: 0,
-                img: d.url,
-                id: d.uid,
-              });
-            });
-            this.filteredSearch.next(returnVal);
-          });
-      });
-  }
+  //       let sub3 = this.db
+  //         .collectionGroup(`Users`, (ref) =>
+  //           ref
+  //             .where('search_name', '>=', term)
+  //             .where('search_name', '<=', term + '\uf8ff')
+  //             .limit(3)
+  //         )
+  //         .valueChanges()
+  //         .subscribe((docs3) => {
+  //           sub3.unsubscribe();
+  //           (docs3 as any[])?.forEach((d: any) => {
+  //             returnVal.push({
+  //               name: d.name,
+  //               type: 0,
+  //               img: d.url,
+  //               id: d.uid,
+  //             });
+  //           });
+  //           this.filteredSearch.next(returnVal);
+  //         });
+  //     });
+  // }
 
   getItem(id: string, callback: (result?: App) => any, getProfiles = false) {
     let sub2 = this.db
@@ -805,11 +807,12 @@ export class LoadService {
       .subscribe(
         async (resp) => {
           // this.loadedChains.next(resp);
+          console.log("chains oy")
+          console.log(JSON.stringify(this.loadedChains.value))
           let util = this.thredService.syncWallet(
             resp,
             this.loadedChains.value
           );
-          console.log(util);
 
           callback(util);
         },

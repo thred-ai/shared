@@ -1,9 +1,5 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { ItemComponent } from './item/item.component';
-import { NetworkComponent } from './network/network.component';
-import { ProfileComponent } from './profile/profile.component';
-import { StoreComponent } from './store/store.component';
 import { WalletViewComponent } from './wallet-view/wallet-view.component';
 
 const routes: Routes = [

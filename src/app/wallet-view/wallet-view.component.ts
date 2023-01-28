@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
+  App,
   Chain,
   Layout,
   Media,
@@ -132,7 +133,10 @@ export class WalletViewComponent implements OnInit {
           bar: page.bar.visible
             ? page.bar.backgroundColor
             : page.backgroundColor,
-          tab: (page.type == 0 || page.type == 2) ? page.tab.backgroundColor : page.backgroundColor,
+          tab:
+            page.type == 0 || page.type == 2
+              ? page.tab.backgroundColor
+              : page.backgroundColor,
           page: page.backgroundColor,
         });
         (window as any).webkit.messageHandlers.colors.postMessage(body);
@@ -279,21 +283,21 @@ export class WalletViewComponent implements OnInit {
     });
     (window as any).webkit?.messageHandlers.colors.postMessage(body);
 
-    var hex: string | undefined = undefined
-    if ((window as any)?.thred){
+    var hex: string | undefined = undefined;
+    if ((window as any)?.thred) {
       hex = (await (window as any)?.thred()) as string;
     }
-    console.log("HEX")
+    console.log('HEX');
     this.loading = true;
     if (hex) {
       // this.butterfly?.addRing();
       this.loadService.finishSignIn(hex, (result) => {
         this.signedIn = true;
         this.loading = false;
-        this.initializeUser(hex!)
+        this.initializeUser(hex!);
       });
     } else {
-      console.log("OUT")
+      console.log('OUT');
       this.signedIn = false; //
       this.loading = false;
       this.updatePageColors(this.activeLayout?.authPage);
@@ -305,22 +309,29 @@ export class WalletViewComponent implements OnInit {
 
     this.loadService.loadedChains.subscribe((chains) => {
       this.chains = chains ?? [];
-      console.log(this.chains)
-      if (chains.length > 0 && this.wallet == undefined) {
-        this.loadService.getWallet(id, (wallet) => {
-          if (wallet) {
-            this.loadService.loadedWallet.next(wallet);
-          }
-        });
-      }
-      else{
-        this.loadService.loadedWallet.next(this.wallet);
+      console.log(this.chains);
+      if (chains.length > 0) {
+        if (this.activeWallet == undefined) {
+          this.loadService.getWallet(id, (wallet) => {
+            if (wallet) {
+              this.loadService.loadedWallet.next(wallet);
+            }
+          });
+        } else {
+          let walletChains = this.activeWallet.chains.map((c) => c.id);
+          this.activeWallet.chains = this.loadService.thredService.syncChains(
+            chains,
+            walletChains
+          );
+          this.loadService.loadedWallet.next(this.activeWallet);
+        }
       }
     });
     this.loadService.loadedWallet.subscribe((wallet) => {
       if (wallet) {
         this.wallet = wallet;
-        console.log(JSON.stringify(wallet.chains))
+        console.log('oy');
+        console.log(JSON.stringify(wallet.chains));
 
         this.loadService.loadNFTsByWallet((nfts) => {
           this.loadService.loadedNFTs.next(nfts ?? []);
@@ -333,19 +344,26 @@ export class WalletViewComponent implements OnInit {
     this.loadService.loadedUser.subscribe(async (user) => {
       this.signedIn = user != null;
       this.user = user ?? undefined;
-      if (user){
-        this.loadService.installChains(true)
-      }
-      else{
-        this.loadService.installChains(false)
+      if (user) {
+        this.loadService.installChains(true);
+      } else {
+        this.loadService.installChains(false);
       }
     });
+  }
+
+  handleClick(event: { type: number; data: any }) {
+    console.log("oy")
+    console.log(JSON.stringify(event))
+    if (event.type == 8 && event.data){
+      (window as any)?.openApp(JSON.parse(JSON.stringify(event.data)))
+    }
   }
 
   async initLoad() {
     let id = await this.getId();
 
-    this.root.ngOnInit()
+    this.root.ngOnInit();
     this.loadService.getWallet(id, (wallet) => {
       if (wallet) {
         this.loadService.loadedWallet.next(wallet);
