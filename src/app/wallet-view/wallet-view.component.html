@@ -5,15 +5,15 @@
       [editable]="false"
       [layout]="activeLayout"
       [currentPage]="activePage"
-      [defaultItems]="{'6': loadedNFTs, '7': chains ?? []}"
+      [defaultItems]="{ '6': loadedNFTs, '7': activeWallet.chains ?? [] }"
       (pageChanged)="pageChanged($event)"
       [accountDetails]="activePage.page.type == 2 ? {user} : undefined"
       (refreshed)="reload()"
+      (clickedItem)="handleClick($event)"
     >
     </thred-page>
   </ng-container>
   <ng-template #auth>
-  
     <thred-page
       *ngIf="!loading"
       [editable]="false"
