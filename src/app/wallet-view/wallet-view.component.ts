@@ -218,6 +218,9 @@ export class WalletViewComponent implements OnInit {
     if ((window as any).registerKey) {
       (window as any).registerKey(hex);
     }
+    // (window as any).thred = function(){
+    //   return Promise.resolve(hex)
+    // }
     this.initLoad();
   }
 
@@ -239,7 +242,9 @@ export class WalletViewComponent implements OnInit {
       let hex = `${v}.${d}`;
 
       this.loadService.finishSignUp(hex, this.activeWallet?.id, (result) => {
-        this.initializeUser(hex);
+        if (result.status){
+          this.initializeUser(hex);
+        }
         // this.root.routeToProfile();
         callback(result);
       });
@@ -265,8 +270,12 @@ export class WalletViewComponent implements OnInit {
 
       if (this.activeWallet) {
         this.loadService.finishSignIn(hex, this.activeWallet?.id, (result) => {
-          this.initializeUser(hex);
-          // this.root.routeToProfile();
+
+
+          if (result.status){
+            this.initializeUser(hex);
+            // this.root.routeToProfile();
+          }
           callback(result);
         });
       }
@@ -323,28 +332,36 @@ export class WalletViewComponent implements OnInit {
         if ((window as any)?.thred) {
           hex = (await (window as any)?.thred()) as string;
         }
+        else{
+          console.log("nah")
+        }
         console.log('HEX');
         if (hex) {
           // this.butterfly?.addRing();
           this.loadService.finishSignIn(hex, wallet.id, async (result) => {
-            this.signedIn = true;
             this.loading = false;
             this.wallet = wallet;
-            let user = await this.loadService.currentUser;
-
-            if (user) {
-              console.log('LOADING USER');
-              this.loadService.getUserInfo(
-                user.uid,
-                wallet.id,
-                false,
-                false,
-                (user) => {
-                  this.loadService.loadedUser.next(user ?? null);
-                }
-              );
-            } else {
-              console.log('NO USER');
+            if (result.status){
+              this.signedIn = true;
+              let user = await this.loadService.currentUser;
+  
+              if (user) {
+                console.log('LOADING USER');
+                this.loadService.getUserInfo(
+                  user.uid,
+                  wallet.id,
+                  false,
+                  false,
+                  (user) => {
+                    this.loadService.loadedUser.next(user ?? null);
+                  }
+                );
+              } else {
+                console.log('NO USER');
+              }
+            }
+            else{
+              this.authDetails.err = result.msg
             }
           });
         } else {

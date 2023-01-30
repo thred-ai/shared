@@ -401,6 +401,9 @@ export class LoadService {
                 callback();
               }
             }
+            else{
+              callback()
+            }
           } else {
             callback();
           }
@@ -445,6 +448,9 @@ export class LoadService {
               } else {
                 callback();
               }
+            }
+            else{
+              callback()
             }
           } else {
             callback();
@@ -611,6 +617,7 @@ export class LoadService {
         let email = doc['email'] as string;
         let joined = doc['joined'] as number;
         let uid = doc['uid'] as string;
+        let address = doc['address'] as string;
         let url = doc['url'] as string;
         let registeredWallets = doc['registeredWallets'] as string[];
         let myUID = (await this.currentUser)?.uid;
@@ -621,7 +628,7 @@ export class LoadService {
         }
         let developer = new User(
           name,
-          uid,
+          address,
           [],
           joined,
           url,
