@@ -51,16 +51,7 @@ export class AppComponent {
 
 
   async ngOnInit() {
-    let user = await this.loadService.currentUser;
-
-    if (user){
-      this.loadService.getUserInfo(user.uid, false, false, user => {
-        this.loadService.loadedUser.next(user ?? null);
-      })
-    }
-    else {
-      console.log("NO USER")
-    }
+    
 
     this.loadService.loadedUser.subscribe((user) => {
       this.uid = user?.id;

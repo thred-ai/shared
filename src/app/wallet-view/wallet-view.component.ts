@@ -53,20 +53,22 @@ export class WalletViewComponent implements OnInit {
       75
     );
 
-    try {
-      this.activeLayout = this.activeWallet.activeLayouts['mobile'];
+    if (value) {
+      try {
+        this.activeLayout = this.activeWallet.activeLayouts['mobile'];
+        console.log(JSON.stringify(this.activeLayout));
+        const pageIndex = Number(
+          this.route.snapshot.queryParamMap.get('page') ?? 0
+        );
+        this.page = {
+          page: this.activeLayout.pages[pageIndex],
+          index: pageIndex,
+        };
 
-      const pageIndex = Number(
-        this.route.snapshot.queryParamMap.get('page') ?? 0
-      );
-      this.page = {
-        page: this.activeLayout.pages[pageIndex],
-        index: pageIndex,
-      };
-
-      // this.refreshNFTS();
-    } catch (error) {
-      console.log(JSON.stringify((error as any).message));
+        // this.refreshNFTS();
+      } catch (error) {
+        console.log(JSON.stringify((error as any).message));
+      }
     }
   }
   chains?: Chain[];
@@ -216,7 +218,6 @@ export class WalletViewComponent implements OnInit {
     if ((window as any).registerKey) {
       (window as any).registerKey(hex);
     }
-    this.root.ngOnInit();
     this.initLoad();
   }
 
@@ -231,13 +232,13 @@ export class WalletViewComponent implements OnInit {
       `$${JSON.stringify({ email, pass })}$`
     );
 
-    if (data) {
+    if (data && this.activeWallet) {
       let d = data.d;
       let v = data.v;
 
       let hex = `${v}.${d}`;
 
-      this.loadService.finishSignUp(hex, (result) => {
+      this.loadService.finishSignUp(hex, this.activeWallet?.id, (result) => {
         this.initializeUser(hex);
         // this.root.routeToProfile();
         callback(result);
@@ -262,11 +263,13 @@ export class WalletViewComponent implements OnInit {
 
       let hex = `${v}.${d}`;
 
-      this.loadService.finishSignIn(hex, (result) => {
-        this.initializeUser(hex);
-        // this.root.routeToProfile();
-        callback(result);
-      });
+      if (this.activeWallet) {
+        this.loadService.finishSignIn(hex, this.activeWallet?.id, (result) => {
+          this.initializeUser(hex);
+          // this.root.routeToProfile();
+          callback(result);
+        });
+      }
     } //
   }
 
@@ -278,30 +281,11 @@ export class WalletViewComponent implements OnInit {
   }
 
   async ngOnInit() {
+
     let body = JSON.stringify({
       reset: true,
     });
     (window as any).webkit?.messageHandlers.colors.postMessage(body);
-
-    var hex: string | undefined = undefined;
-    if ((window as any)?.thred) {
-      hex = (await (window as any)?.thred()) as string;
-    }
-    console.log('HEX');
-    this.loading = true;
-    if (hex) {
-      // this.butterfly?.addRing();
-      this.loadService.finishSignIn(hex, (result) => {
-        this.signedIn = true;
-        this.loading = false;
-        this.initializeUser(hex!);
-      });
-    } else {
-      console.log('OUT');
-      this.signedIn = false; //
-      this.loading = false;
-      this.updatePageColors(this.activeLayout?.authPage);
-    }
 
     console.log('ello');
     let id = await this.getId();
@@ -327,11 +311,49 @@ export class WalletViewComponent implements OnInit {
         }
       }
     });
-    this.loadService.loadedWallet.subscribe((wallet) => {
+    this.loadService.loadedWallet.subscribe(async (wallet) => {
       if (wallet) {
-        this.wallet = wallet;
+
+        this.loading = true;
+        
         console.log('oy');
         console.log(JSON.stringify(wallet.chains));
+
+        var hex: string | undefined = undefined;
+        if ((window as any)?.thred) {
+          hex = (await (window as any)?.thred()) as string;
+        }
+        console.log('HEX');
+        if (hex) {
+          // this.butterfly?.addRing();
+          this.loadService.finishSignIn(hex, wallet.id, async (result) => {
+            this.signedIn = true;
+            this.loading = false;
+            this.wallet = wallet;
+            let user = await this.loadService.currentUser;
+
+            if (user) {
+              console.log('LOADING USER');
+              this.loadService.getUserInfo(
+                user.uid,
+                wallet.id,
+                false,
+                false,
+                (user) => {
+                  this.loadService.loadedUser.next(user ?? null);
+                }
+              );
+            } else {
+              console.log('NO USER');
+            }
+          });
+        } else {
+          console.log('OUT');
+          this.signedIn = false; //
+          this.loading = false;
+          this.wallet = wallet;
+          this.updatePageColors(this.activeLayout?.authPage);
+        }
 
         this.loadService.loadNFTsByWallet((nfts) => {
           this.loadService.loadedNFTs.next(nfts ?? []);
@@ -344,30 +366,26 @@ export class WalletViewComponent implements OnInit {
     this.loadService.loadedUser.subscribe(async (user) => {
       this.signedIn = user != null;
       this.user = user ?? undefined;
-      if (user) {
-        this.loadService.installChains(true);
+      if (user && this.activeWallet) {
+        console.log('LOADING CHAIN BALANCE');
+        this.loadService.installChains(true, this.activeWallet.id);
       } else {
+        console.log('LOADING CHAINS');
         this.loadService.installChains(false);
       }
     });
   }
 
   handleClick(event: { type: number; data: any }) {
-    console.log("oy")
-    console.log(JSON.stringify(event))
-    if (event.type == 8 && event.data){
-      (window as any)?.openApp(JSON.parse(JSON.stringify(event.data)))
+    console.log('oy');
+    console.log(JSON.stringify(event));
+    if (event.type == 8 && event.data) {
+      (window as any)?.openApp(JSON.parse(JSON.stringify(event.data)));
     }
   }
 
   async initLoad() {
-    let id = await this.getId();
-
-    this.root.ngOnInit();
-    this.loadService.getWallet(id, (wallet) => {
-      if (wallet) {
-        this.loadService.loadedWallet.next(wallet);
-      }
-    });
+    if (this.activeWallet)
+      this.loadService.loadedWallet.next(this.activeWallet);
   }
 }

@@ -72,12 +72,13 @@ export class LoadService {
     this.setRequest();
   }
 
-  installChains(getBalances = false) {
-    this.getChains(getBalances, (chains) => {
+  installChains(getBalances = false, wallet?: string) {
+    this.getChains(getBalances, wallet, (chains) => {
       (window as any).thred_chains = JSON.stringify(chains);
       (window as any).webkit?.messageHandlers?.chains.postMessage(
         JSON.stringify(chains)
       );
+      console.log("CHAINS -- " + JSON.stringify(chains))
       this.loadedChains.next(chains);
     });
   }
@@ -98,15 +99,16 @@ export class LoadService {
       try {
         let payload = JSON.parse(data);
         payload.id = await (window as any).thred();
-        console.log(JSON.stringify(payload))
+        payload.wallet = this.loadedWallet.value?.id
+        console.log(JSON.stringify(payload));
         this.functions
           .httpsCallable('transact')(payload)
           .pipe(first())
           .toPromise()
           .then(async (resp) => {
             if (resp) {
-              console.log(JSON.stringify(resp))
-              
+              console.log(JSON.stringify(resp));
+
               callback(
                 JSON.stringify({ success: true, error: null, data: resp })
               );
@@ -191,9 +193,10 @@ export class LoadService {
 
   finishSignUp(
     encryption: string,
+    wallet: string,
     callback: (result: { status: boolean; msg: string }) => any
   ) {
-    this.createUser(encryption, (user) => {
+    this.createUser(encryption, wallet, (user) => {
       if (user) {
         callback({ status: true, msg: 'success' });
       } else {
@@ -207,9 +210,10 @@ export class LoadService {
 
   finishSignIn(
     encryption: string,
+    wallet: string,
     callback: (result: { status: boolean; msg: string }) => any
   ) {
-    this.signInUser(encryption, (user) => {
+    this.signInUser(encryption, wallet, (user) => {
       if (user) {
         callback({ status: true, msg: 'success' });
       } else {
@@ -292,19 +296,19 @@ export class LoadService {
 
   installApp(sig: string, id: string, callback: (success: boolean) => any) {
     this.functions
-      .httpsCallable('installApps')({ sig, id })
+      .httpsCallable('installApps')({ sig, id }) 
       .pipe(first())
       .subscribe(async (resp) => {
         callback(resp);
       });
   }
 
-  async getChains(getBalances = false, callback: (result: Chain[]) => any) {
+  async getChains(getBalances = false, wallet: string | undefined = undefined, callback: (result: Chain[]) => any) {
     console.log('USER -- ' + JSON.stringify((await this.currentUser)?.uid));
-    let thred = (window as any)?.thred;
+    // let thred = (window as any)?.thred;
     this.functions
       .httpsCallable('getChainsForWallet')({
-        id: thred ? await thred() : undefined,
+        wallet,
         getBalances,
       })
       .pipe(first())
@@ -353,18 +357,18 @@ export class LoadService {
     }
   }
 
-  send(reqData: string) {
-    this.functions
-      .httpsCallable('transact')(reqData)
-      .pipe(first())
-      .subscribe(async (resp) => {
-        (window as any)?.reqResponse(JSON.stringify(resp));
-      });
-  }
+  // send(reqData: string) {
+  //   this.functions
+  //     .httpsCallable('transact')(reqData)
+  //     .pipe(first())
+  //     .subscribe(async (resp) => {
+  //       (window as any)?.reqResponse(JSON.stringify(resp));
+  //     });
+  // }
 
-  createUser(hex: string, callback: (user?: User) => any) {
+  createUser(hex: string, wallet: string, callback: (user?: User) => any) {
     this.functions
-      .httpsCallable('createNewUser')({ id: hex })
+      .httpsCallable('createNewUser')({ id: hex, isEmail: true, wallet })
       .pipe(first())
       .subscribe(
         async (resp) => {
@@ -408,9 +412,9 @@ export class LoadService {
       );
   }
 
-  signInUser(hex: string, callback: (user?: User) => any) {
+  signInUser(hex: string, wallet: string, callback: (user?: User) => any) {
     this.functions
-      .httpsCallable('signInUser')({ id: hex })
+      .httpsCallable('signInUser')({ id: hex, isEmail: true, wallet })
       .pipe(first())
       .subscribe(
         async (resp) => {
@@ -518,12 +522,12 @@ export class LoadService {
           //   d.chains[i] = this.chains.find((x) => x.id == c);
           // });
           if (getProfiles) {
-            this.getUserInfo(d.creator, false, false, (result) => {
-              if (result) {
-                util.creatorName = result.name;
-              }
-              callback(util);
-            });
+            // this.getUserInfo(d.creator, false, false, (result) => {
+            //   if (result) {
+            //     util.creatorName = result.name;
+            //   }
+            //   callback(util);
+            // });
           } else {
             callback(util);
           }
@@ -589,13 +593,15 @@ export class LoadService {
 
   getUserInfo(
     uid: string,
+    walletId: string,
     fetchItems = true,
     fetchOnlyAvailableItems = true,
     callback: (result?: User) => any
   ) {
-    var query = this.db.collection('Users', (ref) =>
-      ref.where(firebase.firestore.FieldPath.documentId(), '==', uid)
-    );
+    var query = this.db
+      .collection('Users')
+      .doc(uid)
+      .collection('Accounts', (ref) => ref.where('wallet', '==', walletId));
 
     let sub = query.valueChanges().subscribe(async (docs) => {
       let doc = docs[0] as DocumentData;
@@ -807,8 +813,8 @@ export class LoadService {
       .subscribe(
         async (resp) => {
           // this.loadedChains.next(resp);
-          console.log("chains oy")
-          console.log(JSON.stringify(this.loadedChains.value))
+          console.log('chains oy');
+          console.log(JSON.stringify(this.loadedChains.value));
           let util = this.thredService.syncWallet(
             resp,
             this.loadedChains.value
