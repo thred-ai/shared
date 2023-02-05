@@ -9,7 +9,6 @@ import {
   ANIMATION_MODULE_TYPE,
   BrowserAnimationsModule,
 } from '@angular/platform-browser/animations';
-import { CommonModule } from '@angular/common';
 import { AngularFireModule } from '@angular/fire/compat';
 import { environment } from '../environments/environment';
 // import { Globals } from './globals';
@@ -78,7 +77,11 @@ import { WalletViewComponent } from './wallet-view/wallet-view.component';
 import { SafeUrlPipe } from './safe-url.pipe';
 import { TokenFilterPipe } from './token-filter.pipe';
 import { NumValuePipe } from './num-value.pipe';
+import { CollectionCarouselComponent } from './collection-carousel/collection-carousel.component';
+import { TransactionDialogComponent } from './transaction-dialog/transaction-dialog.component';
+import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
 import { ThredCoreModule } from 'thred-core';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -94,7 +97,9 @@ import { ThredCoreModule } from 'thred-core';
     FirstLetterPipe,
     NumValuePipe,
     SafeUrlPipe,
-    TokenFilterPipe
+    TokenFilterPipe,
+    CollectionCarouselComponent,
+    TransactionDialogComponent
   ],
   imports: [
     CommonModule,
@@ -113,6 +118,7 @@ import { ThredCoreModule } from 'thred-core';
     MatSnackBarModule,
     DragScrollModule,
     MatDialogModule,
+    MatBottomSheetModule,
     MatSnackBarModule,
     InViewportModule,
     HttpClientModule,

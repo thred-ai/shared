@@ -53,6 +53,7 @@ export class AppComponent {
   async ngOnInit() {
     
 
+    console.log("oi cunt")
     this.loadService.loadedUser.subscribe((user) => {
       this.uid = user?.id;
       // if (!user){

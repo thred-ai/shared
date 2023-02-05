@@ -7,6 +7,9 @@
 
 #import <Foundation/Foundation.h>
 #import <Capacitor/Capacitor.h>
-CAP_PLUGIN(PluginTest, "ThredMessage",
-           CAP_PLUGIN_METHOD(postMessage, CAPPluginReturnPromise);
+CAP_PLUGIN(PluginTest, "ThredMobileCore",
+           CAP_PLUGIN_METHOD(confirmTransaction, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(openApp, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(setWallet, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(getWallet, CAPPluginReturnPromise);
 )

@@ -25,10 +25,10 @@
       "stream": [
         "node_modules/stream-browserify"
       ],
-      "thred-core": [
-        "dist/thredcore/thredcore",
-        "dist/thredcore"
-      ]
+      // "thred-core": [
+      //   "dist/thredcore/thredcore",
+      //   "dist/thredcore"
+      // ]
     }
   },
   "angularCompilerOptions": {

@@ -6,14 +6,17 @@
 //
 
 import UIKit
+import Capacitor
 
-class AppController: UIViewController {
+class AppController: CAPBridgeViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         // Do any additional setup after loading the view.
     }
+    
+    
     
 
     /*

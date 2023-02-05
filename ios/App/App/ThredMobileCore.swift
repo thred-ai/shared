@@ -6,21 +6,38 @@
 //
 
 import Capacitor
-import BottomSheet
+import MaterialComponents.MaterialBottomSheet
 
 @objc(PluginTest)
 public class ThredMobileCore: CAPPlugin {
-    @objc func postMessage(_ call: CAPPluginCall) {
+    
+    @objc func setWallet(_ call: CAPPluginCall) {
+        
+    }
+    
+    @objc func getWallet(_ call: CAPPluginCall) {
+        
+    }
+    
+    @objc func openApp(_ call: CAPPluginCall) {
+        if let app = call.getString("appData"), let vc = bridge?.viewController as? CAPBridgeViewController{
+            DispatchQueue.main.async{
+                let viewController: AppController = AppController()
+
+                vc.present(viewController, animated: true, completion: nil)
+            }
+        }
+    }
+    
+    @objc func confirmTransaction(_ call: CAPPluginCall) {
         if let style = call.getString("path"), let vc = bridge?.viewController as? CAPBridgeViewController{
             DispatchQueue.main.async{
-                BottomSheet..presentBottomSheet(
-                    viewController: vc,
-                    configuration: BottomSheetConfiguration(
-                        cornerRadius: 10,
-                        pullBarConfiguration: .visible(.init(height: 20)),
-                        shadowConfiguration: .init(backgroundColor: UIColor.black.withAlphaComponent(0.6))
-                    )
-                )
+//                // View controller the bottom sheet will hold
+//                let viewController: ViewController = ViewController()
+//                // Initialize the bottom sheet with the view controller just created
+//                let bottomSheet: MDCBottomSheetController = MDCBottomSheetController(contentViewController: viewController)
+//                // Present the bottom sheet
+//                vc.present(bottomSheet, animated: true, completion: nil)
             }
         }
         

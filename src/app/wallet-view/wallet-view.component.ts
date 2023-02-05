@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   App,
@@ -13,6 +15,9 @@ import {
 } from 'thred-core';
 import { AppComponent } from '../app.component';
 import { LoadService } from '../load.service';
+import { TransactionDialogComponent } from '../transaction-dialog/transaction-dialog.component';
+import { SafeArea } from 'capacitor-plugin-safe-area';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 @Component({
   selector: 'app-wallet-view',
@@ -24,8 +29,45 @@ export class WalletViewComponent implements OnInit {
     private loadService: LoadService,
     private route: ActivatedRoute,
     private router: Router,
-    private root: AppComponent
-  ) {}
+    private root: AppComponent,
+    private _bottomSheet: MatBottomSheet,
+    private dialog: MatDialog
+  ) {
+    (window as any).thred_request = this.thred_request;
+  }
+
+  thred_request = async (data: string) => {
+    return new Promise(async (resolve, reject) => {
+      let ref = this._bottomSheet.open(TransactionDialogComponent, { data });
+
+      ref.afterDismissed().subscribe((result) => {
+        if (result && result !== '') {
+          this.loadService.setRequest(data, resolve);
+        } else {
+          resolve('rejected');
+        }
+      });
+      // let result = await (
+      //   window as any
+      // ).webkit.messageHandlers.thred_request.postMessage(data);
+
+      // if (result == '"rejected"') {
+      //   resolve(result);
+      // } else {
+      //   (window as any).sendRequest(data, resolve);
+      // }
+    });
+  };
+
+  openApp(data: any) {
+    // this.dialog.open(AppWindowComponent, {
+    //   width: '2000px',
+    //   maxHeight: '100vh',
+    //   maxWidth: '100vw',
+    //   panelClass: 'app-full-bleed-dialog',
+    //   data,
+    // });
+  }
 
   activeWallet?: Wallet;
   user?: User;
@@ -97,8 +139,8 @@ export class WalletViewComponent implements OnInit {
   }
 
   reload() {
-    (window as any).webkit.messageHandlers.vibrate.postMessage({});
-
+    // (window as any).webkit.messageHandlers.vibrate.postMessage({});
+    this.vibrate()
     setTimeout(() => {
       window.location.reload();
     }, 1000); //
@@ -210,18 +252,45 @@ export class WalletViewComponent implements OnInit {
           this.authDetails.err = result.msg;
         }
       });
+    } else if (event.type == 'new_account') {
+      this.authDetails.loading = true;
+
+      this.handleNewAccount((result) => {
+        this.authDetails.loading = false;
+
+        if (result.status) {
+        } else {
+          this.authDetails.err = result.msg;
+        }
+      });
+    } else if (event.type == 'import_account') {
+      this.authDetails.loading = true;
+
+      this.handleImport(event.data, (result) => {
+        this.authDetails.loading = false;
+
+        if (result.status) {
+        } else {
+          this.authDetails.err = result.msg;
+        }
+      });
     }
   }
 
   initializeUser(hex: string) {
     this.signedIn = true;
-    if ((window as any).registerKey) {
-      (window as any).registerKey(hex);
-    }
+    // if ((window as any).registerKey) {
+    //   (window as any).registerKey(hex);
+    // }
     // (window as any).thred = function(){
     //   return Promise.resolve(hex)
     // }
     this.initLoad();
+  }
+
+
+  async vibrate(){
+    await Haptics.impact({ style: ImpactStyle.Medium });
   }
 
   private handleSignUp(
@@ -242,8 +311,8 @@ export class WalletViewComponent implements OnInit {
       let hex = `${v}.${d}`;
 
       this.loadService.finishSignUp(hex, this.activeWallet?.id, (result) => {
-        if (result.status){
-          this.initializeUser(hex);
+        if (result.status && result.hex) {
+          this.initializeUser(result.hex);
         }
         // this.root.routeToProfile();
         callback(result);
@@ -270,16 +339,55 @@ export class WalletViewComponent implements OnInit {
 
       if (this.activeWallet) {
         this.loadService.finishSignIn(hex, this.activeWallet?.id, (result) => {
-
-
-          if (result.status){
-            this.initializeUser(hex);
+          if (result.status && result.hex) {
+            this.initializeUser(result.hex);
             // this.root.routeToProfile();
           }
           callback(result);
         });
       }
     } //
+  }
+
+  private handleImport(
+    authData: any,
+    callback: (result: { status: boolean; msg: string }) => any
+  ) {
+    let key = authData['key'];
+
+    let data = this.loadService.encryptData(`$${JSON.stringify({ key })}$`);
+    console.log(key);
+    //
+    if (data) {
+      let d = data.d;
+      let v = data.v;
+
+      let hex = `${v}.${d}`;
+
+      if (this.activeWallet) {
+        this.loadService.finishImport(hex, this.activeWallet?.id, (result) => {
+          if (result.status && result.hex) {
+            this.initializeUser(result.hex);
+            // this.root.routeToProfile();
+          }
+          callback(result);
+        });
+      }
+    } //
+  }
+
+  private handleNewAccount(
+    callback: (result: { status: boolean; msg: string }) => any
+  ) {
+    if (this.activeWallet) {
+      this.loadService.finishNew(this.activeWallet?.id, (result) => {
+        if (result.status && result.hex) {
+          this.initializeUser(result.hex);
+          // this.root.routeToProfile();
+        }
+        callback(result);
+      });
+    }
   }
 
   private handlePassReset(
@@ -289,12 +397,19 @@ export class WalletViewComponent implements OnInit {
     let email = authData['email'];
   }
 
+  safeAreaTop = 0
+  safeAreaBottom = 0
+
   async ngOnInit() {
 
-    let body = JSON.stringify({
-      reset: true,
-    });
-    (window as any).webkit?.messageHandlers.colors.postMessage(body);
+    let insets = (await SafeArea.getSafeAreaInsets()).insets;
+    
+    this.safeAreaBottom = insets.bottom
+
+    this.safeAreaTop = (await SafeArea.getStatusBarHeight()).statusBarHeight
+
+   
+    // (window as any).webkit?.messageHandlers.colors.postMessage(body);
 
     console.log('ello');
     let id = await this.getId();
@@ -316,37 +431,22 @@ export class WalletViewComponent implements OnInit {
             chains,
             walletChains
           );
-          this.loadService.loadedWallet.next(this.activeWallet);
+          // this.loadService.loadedWallet.next(this.activeWallet);
         }
       }
     });
     this.loadService.loadedWallet.subscribe(async (wallet) => {
       if (wallet) {
-
         this.loading = true;
-        
+
         console.log('oy');
         console.log(JSON.stringify(wallet.chains));
-
-        var hex: string | undefined = undefined;
-        if ((window as any)?.thred) {
-          hex = (await (window as any)?.thred()) as string;
-        }
-        else{
-          console.log("nah")
-        }
-        console.log('HEX');
-        if (hex) {
-          // this.butterfly?.addRing();
-          this.loadService.finishSignIn(hex, wallet.id, async (result) => {
-            this.loading = false;
-            this.wallet = wallet;
-            if (result.status){
-              this.signedIn = true;
-              let user = await this.loadService.currentUser;
-  
+        this.loading = false;
+        this.wallet = wallet;
+        let user = await this.loadService.currentUser;
               if (user) {
                 console.log('LOADING USER');
+                this.signedIn = true
                 this.loadService.getUserInfo(
                   user.uid,
                   wallet.id,
@@ -358,23 +458,46 @@ export class WalletViewComponent implements OnInit {
                 );
               } else {
                 console.log('NO USER');
+                this.signedIn = false
               }
-            }
-            else{
-              this.authDetails.err = result.msg
-            }
-          });
-        } else {
-          console.log('OUT');
-          this.signedIn = false; //
-          this.loading = false;
-          this.wallet = wallet;
-          this.updatePageColors(this.activeLayout?.authPage);
-        }
 
-        this.loadService.loadNFTsByWallet((nfts) => {
-          this.loadService.loadedNFTs.next(nfts ?? []);
-        });
+        // var hex: string | undefined = undefined;
+        // if ((window as any)?.thred) {
+        //   hex = (await (window as any)?.thred()) as string;
+        // } else {
+        //   console.log('nah');
+        // }
+        // console.log('HEX');
+        // if (hex) {
+        //   // this.butterfly?.addRing();
+        //   this.loadService.verifyUser(hex, async (user, hex) => {
+        //     this.loading = false;
+        //     this.wallet = wallet;
+        //     if (user && hex) {
+        //       this.signedIn = true;
+        //       let user = await this.loadService.currentUser;
+        //       if (user) {
+        //         console.log('LOADING USER');
+        //         this.loadService.getUserInfo(
+        //           user.uid,
+        //           wallet.id,
+        //           false,
+        //           false,
+        //           (user) => {
+        //             this.loadService.loadedUser.next(user ?? null);
+        //           }
+        //         );
+        //       } else {
+        //         console.log('NO USER');
+        //       }
+        //     }
+        //   });
+        // } else {
+        //   console.log('OUT');
+        //   this.signedIn = false; //
+        //   this.loading = false;
+        //   this.wallet = wallet;
+        // }
       }
     });
     this.loadService.loadedNFTs.subscribe((nfts) => {
@@ -386,6 +509,9 @@ export class WalletViewComponent implements OnInit {
       if (user && this.activeWallet) {
         console.log('LOADING CHAIN BALANCE');
         this.loadService.installChains(true, this.activeWallet.id);
+        this.loadService.loadNFTsByWallet(user.id, (nfts) => {
+          this.loadService.loadedNFTs.next(nfts ?? []);
+        });
       } else {
         console.log('LOADING CHAINS');
         this.loadService.installChains(false);
@@ -397,7 +523,8 @@ export class WalletViewComponent implements OnInit {
     console.log('oy');
     console.log(JSON.stringify(event));
     if (event.type == 8 && event.data) {
-      (window as any)?.openApp(JSON.parse(JSON.stringify(event.data)));
+      // (window as any)?.openApp(JSON.parse(JSON.stringify(event.data)));
+      this.openApp(event.data);
     }
   }
 

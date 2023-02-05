@@ -51,34 +51,35 @@ export class LoadService {
     private storage: AngularFireStorage,
     public thredService: ThredCoreService
   ) {
-    this.auth.signOut();
+
+    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+
+    // this.auth.signOut();
     this.initProviders();
 
     this.getSigners((signers) => {
       if (!signers) {
         return;
       }
-      let injectedSigner = signers?.injectedSigner;
+      // let injectedSigner = signers?.injectedSigner;
       let nativeSigner = signers?.nativeSigner;
 
-      (window as any).thred_request = this.thred_request;
-      (window as any).webkit?.messageHandlers.signers.postMessage(
-        injectedSigner
-      );
+      // (window as any).webkit?.messageHandlers.signers.postMessage(
+      //   injectedSigner
+      // );
 
       eval(nativeSigner);
     });
 
-    this.setRequest();
   }
 
   installChains(getBalances = false, wallet?: string) {
     this.getChains(getBalances, wallet, (chains) => {
       (window as any).thred_chains = JSON.stringify(chains);
-      (window as any).webkit?.messageHandlers?.chains.postMessage(
-        JSON.stringify(chains)
-      );
-      console.log("CHAINS -- " + JSON.stringify(chains))
+      // (window as any).webkit?.messageHandlers?.chains.postMessage(
+      //   JSON.stringify(chains)
+      // );
+      console.log('CHAINS -- ' + JSON.stringify(chains));
       this.loadedChains.next(chains);
     });
   }
@@ -91,39 +92,37 @@ export class LoadService {
     return str;
   }
 
-  async setRequest() {
-    (window as any).sendRequest = async (
-      data: string,
-      callback: (result: string | null) => any = (window as any)?.reqResponse
-    ) => {
-      try {
-        let payload = JSON.parse(data);
-        payload.id = await (window as any).thred();
-        payload.wallet = this.loadedWallet.value?.id
-        console.log(JSON.stringify(payload));
-        this.functions
-          .httpsCallable('transact')(payload)
-          .pipe(first())
-          .toPromise()
-          .then(async (resp) => {
-            if (resp) {
-              console.log(JSON.stringify(resp));
+  async setRequest(
+    data: string,
+    callback: (result: string | null) => any = (window as any)?.reqResponse
+  ) {
+    try {
+      let payload = JSON.parse(data);
+      // payload.id = await (window as any).thred();
+      payload.wallet = this.loadedWallet.value?.id;
+      console.log(JSON.stringify(payload));
+      this.functions
+        .httpsCallable('transact')(payload)
+        .pipe(first())
+        .toPromise()
+        .then(async (resp) => {
+          if (resp) {
+            console.log(JSON.stringify(resp));
 
-              callback(
-                JSON.stringify({ success: true, error: null, data: resp })
-              );
-            }
-          })
-          .catch((error) => {
-            console.log(error.message);
-            callback(JSON.stringify({ success: false, error, data: null }));
-          });
-      } catch (error: any) {
-        console.log(error.message);
-        console.log(JSON.stringify(error));
-        callback(null);
-      }
-    };
+            callback(
+              JSON.stringify({ success: true, error: null, data: resp })
+            );
+          }
+        })
+        .catch((error) => {
+          console.log(error.message);
+          callback(JSON.stringify({ success: false, error, data: null }));
+        });
+    } catch (error: any) {
+      console.log(error.message);
+      console.log(JSON.stringify(error));
+      callback(null);
+    }
 
     // .subscribe(
     //   async (resp) => {
@@ -194,11 +193,11 @@ export class LoadService {
   finishSignUp(
     encryption: string,
     wallet: string,
-    callback: (result: { status: boolean; msg: string }) => any
+    callback: (result: { status: boolean; msg: string; hex?: any }) => any
   ) {
-    this.createUser(encryption, wallet, (user) => {
-      if (user) {
-        callback({ status: true, msg: 'success' });
+    this.createUser(encryption, wallet, (user, hex) => {
+      if (user && hex) {
+        callback({ status: true, msg: 'success', hex });
       } else {
         callback({
           status: false,
@@ -211,11 +210,44 @@ export class LoadService {
   finishSignIn(
     encryption: string,
     wallet: string,
-    callback: (result: { status: boolean; msg: string }) => any
+    callback: (result: { status: boolean; msg: string; hex?: any }) => any
   ) {
-    this.signInUser(encryption, wallet, (user) => {
-      if (user) {
-        callback({ status: true, msg: 'success' });
+    this.signInUser(encryption, wallet, (user, hex) => {
+      if (user && hex) {
+        callback({ status: true, msg: 'success', hex });
+      } else {
+        callback({
+          status: false,
+          msg: 'Invalid Credentials. Please try again',
+        });
+      }
+    });
+  }
+
+  finishImport(
+    encryption: string,
+    wallet: string,
+    callback: (result: { status: boolean; msg: string; hex?: any }) => any
+  ) {
+    this.importUser(encryption, wallet, (user, hex) => {
+      if (user && hex) {
+        callback({ status: true, msg: 'success', hex });
+      } else {
+        callback({
+          status: false,
+          msg: 'Invalid Credentials. Please try again',
+        });
+      }
+    });
+  }
+
+  finishNew(
+    wallet: string,
+    callback: (result: { status: boolean; msg: string; hex?: any }) => any
+  ) {
+    this.newUser(wallet, (user, hex) => {
+      if (user && hex) {
+        callback({ status: true, msg: 'success', hex });
       } else {
         callback({
           status: false,
@@ -296,14 +328,18 @@ export class LoadService {
 
   installApp(sig: string, id: string, callback: (success: boolean) => any) {
     this.functions
-      .httpsCallable('installApps')({ sig, id }) 
+      .httpsCallable('installApps')({ sig, id })
       .pipe(first())
       .subscribe(async (resp) => {
         callback(resp);
       });
   }
 
-  async getChains(getBalances = false, wallet: string | undefined = undefined, callback: (result: Chain[]) => any) {
+  async getChains(
+    getBalances = false,
+    wallet: string | undefined = undefined,
+    callback: (result: Chain[]) => any
+  ) {
     console.log('USER -- ' + JSON.stringify((await this.currentUser)?.uid));
     // let thred = (window as any)?.thred;
     this.functions
@@ -366,7 +402,11 @@ export class LoadService {
   //     });
   // }
 
-  createUser(hex: string, wallet: string, callback: (user?: User) => any) {
+  createUser(
+    hex: string,
+    wallet: string,
+    callback: (user?: User, hex?: any) => any
+  ) {
     this.functions
       .httpsCallable('createNewUser')({ id: hex, isEmail: true, wallet })
       .pipe(first())
@@ -377,6 +417,7 @@ export class LoadService {
             if (success) {
               let userData = resp.userData as any;
               let token = resp.token as string;
+              let id = resp.id as string;
 
               if (userData && token) {
                 this.auth
@@ -391,7 +432,7 @@ export class LoadService {
                       userData.email,
                       userData.registeredWallets
                     );
-                    callback(user);
+                    callback(user, id);
                   })
                   .catch((err: Error) => {
                     //console.log(err);
@@ -400,9 +441,8 @@ export class LoadService {
               } else {
                 callback();
               }
-            }
-            else{
-              callback()
+            } else {
+              callback();
             }
           } else {
             callback();
@@ -415,7 +455,11 @@ export class LoadService {
       );
   }
 
-  signInUser(hex: string, wallet: string, callback: (user?: User) => any) {
+  signInUser(
+    hex: string,
+    wallet: string,
+    callback: (user?: User, hex?: any) => any
+  ) {
     this.functions
       .httpsCallable('signInUser')({ id: hex, isEmail: true, wallet })
       .pipe(first())
@@ -426,8 +470,9 @@ export class LoadService {
             if (success) {
               let userData = resp.userData as any;
               let token = resp.token as string;
+              let id = resp.id as string;
 
-              if (userData && token) {
+              if (userData && token && id) {
                 this.auth
                   .signInWithCustomToken(token)
                   .then((userRecord) => {
@@ -440,7 +485,7 @@ export class LoadService {
                       userData.email,
                       userData.registeredWallets
                     );
-                    callback(user);
+                    callback(user, id);
                   })
                   .catch((err: Error) => {
                     //
@@ -448,9 +493,157 @@ export class LoadService {
               } else {
                 callback();
               }
+            } else {
+              callback();
             }
-            else{
-              callback()
+          } else {
+            callback();
+          }
+        },
+        (err) => {
+          console.error({ err });
+          callback();
+        }
+      );
+  }
+
+  verifyUser(hex: string, callback: (user?: User, hex?: any) => any) {
+    this.functions
+      .httpsCallable('verifyUser')({ id: hex })
+      .pipe(first())
+      .subscribe(
+        async (resp) => {
+          if (resp as any) {
+            let success = resp.success as boolean;
+            if (success) {
+              let userData = resp.userData as any;
+              let token = resp.token as string;
+              let id = resp.id as string;
+
+              if (userData && token && id) {
+                this.auth
+                  .signInWithCustomToken(token)
+                  .then((userRecord) => {
+                    let user = new User(
+                      userData.name,
+                      userData.uid,
+                      [],
+                      userData.joined,
+                      userData.url,
+                      userData.email,
+                      userData.registeredWallets
+                    );
+                    callback(user, id);
+                  })
+                  .catch((err: Error) => {
+                    //
+                  });
+              } else {
+                callback();
+              }
+            } else {
+              callback();
+            }
+          } else {
+            callback();
+          }
+        },
+        (err) => {
+          console.error({ err });
+          callback();
+        }
+      );
+  }
+
+  importUser(
+    hex: string,
+    wallet: string,
+    callback: (user?: User, hex?: any) => any
+  ) {
+    this.functions
+      .httpsCallable('signInUser')({ id: hex, isEmail: false, wallet })
+      .pipe(first())
+      .subscribe(
+        async (resp) => {
+          if (resp as any) {
+            let success = resp.success as boolean;
+            if (success) {
+              let userData = resp.userData as any;
+              let token = resp.token as string;
+              let id = resp.id as string;
+
+              if (userData && token && id) {
+                this.auth
+                  .signInWithCustomToken(token)
+                  .then((userRecord) => {
+                    let user = new User(
+                      userData.name,
+                      userData.uid,
+                      [],
+                      userData.joined,
+                      userData.url,
+                      userData.email,
+                      userData.registeredWallets
+                    );
+                    callback(user, id);
+                  })
+                  .catch((err: Error) => {
+                    //
+                  });
+              } else {
+                callback();
+              }
+            } else {
+              callback();
+            }
+          } else {
+            callback();
+          }
+        },
+        (err) => {
+          console.error({ err });
+          callback();
+        }
+      );
+  }
+
+  newUser(wallet: string, callback: (user?: User, hex?: any) => any) {
+    this.functions
+      .httpsCallable('createNewUser')({ isEmail: false, wallet })
+      .pipe(first())
+      .subscribe(
+        async (resp) => {
+          if (resp as any) {
+            let success = resp.success as boolean;
+            if (success) {
+              let userData = resp.userData as any;
+              let token = resp.token as string;
+              let id = resp.id as string;
+
+              if (userData && token && id) {
+                this.auth
+                  .signInWithCustomToken(token)
+                  .then((userRecord) => {
+                    let user = new User(
+                      userData.name,
+                      userData.uid,
+                      [],
+                      userData.joined,
+                      userData.url,
+                      userData.email,
+                      userData.registeredWallets
+                    );
+                    callback(user, id);
+                  })
+                  .catch((err: Error) => {
+                    //console.log(err);
+                    callback();
+                  });
+              } else {
+                callback();
+              }
+            } else {
+              callback();
             }
           } else {
             callback();
@@ -689,19 +882,6 @@ export class LoadService {
     }
   }
 
-  thred_request = async (data: string) => {
-    return new Promise(async (resolve, reject) => {
-      let result = await (
-        window as any
-      ).webkit.messageHandlers.thred_request.postMessage(data);
-      if (result == '"rejected"') {
-        resolve(result);
-      } else {
-        (window as any).sendRequest(data, resolve);
-      }
-    });
-  };
-
   getSigners(
     callback: (result?: { injectedSigner: string; nativeSigner: string }) => any
   ) {
@@ -785,9 +965,7 @@ export class LoadService {
       );
   }
 
-  async loadNFTsByWallet(callback: (nfts: NFT[]) => any) {
-    let uid = (await this.currentUser)?.uid;
-
+  async loadNFTsByWallet(uid: string, callback: (nfts: NFT[]) => any) {
     if (uid) {
       this.functions
         .httpsCallable('getNFTsByWallet')({ uid })

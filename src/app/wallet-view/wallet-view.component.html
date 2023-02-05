@@ -5,11 +5,12 @@
       [editable]="false"
       [layout]="activeLayout"
       [currentPage]="activePage"
-      [defaultItems]="{ '6': loadedNFTs, '7': activeWallet.chains ?? [] }"
+      [defaultItems]="{ '6': loadedNFTs, '7': activeWallet.chains }"
       (pageChanged)="pageChanged($event)"
       [accountDetails]="activePage.page.type == 2 ? {user} : undefined"
       (refreshed)="reload()"
       (clickedItem)="handleClick($event)"
+      [safeArea]="{bottom: safeAreaBottom, top: safeAreaTop}"
     >
     </thred-page>
   </ng-container>
@@ -21,7 +22,11 @@
       [currentPage]="{ page: activeLayout.authPage, index: 0 }"
       [authDetails]="authDetails"
       (authUpdated)="parseAuth($event)"
+      [safeArea]="{bottom: safeAreaBottom, top: safeAreaTop}"
     >
     </thred-page>
   </ng-template>
+  <!-- <app-collection-carousel>
+
+  </app-collection-carousel> -->
 </div>
