@@ -29,7 +29,7 @@ export class NetworkComponent implements OnInit {
       this.loadService.loadedChains.subscribe(async (chains) => {
         this.chain = chains.find((c) => c.id == this.getId());
         if (this.chain) {
-          this.root.initApp(this.chain.name);
+          // this.root.initApp(this.chain.name);
 
           let balance = ethers.BigNumber.from(
             await (window as any).ethereum.request({

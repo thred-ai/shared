@@ -31,6 +31,7 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
+              "src/signer",
               {
                 "glob": "**/*.svg",
                 "input": "node_modules/ionicons/dist/ionicons/svg",
@@ -106,7 +107,8 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              "src/signer"
             ],
             "styles": [
               "src/styles.scss"

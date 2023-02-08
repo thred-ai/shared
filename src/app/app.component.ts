@@ -2,7 +2,11 @@ import { Component, ViewChild } from '@angular/core';
 import { initializeApp } from '@angular/fire/app';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ethers } from 'ethers';
+import ThredSigner from 'src/signer/signer.model';
+import { ThredMobilePlugin } from 'src/ThredCorePlugin';
+import { App } from 'thred-core';
 import { LoadService } from './load.service';
+import { SignerService } from './signer.service';
 
 @Component({
   selector: 'app-root',
@@ -38,41 +42,82 @@ export class AppComponent {
   constructor(
     private router: ActivatedRoute,
     private _router: Router,
-    private loadService: LoadService
+    private loadService: LoadService,
+    private signerService: SignerService
   ) {}
 
-  toHex(str: string) {
-    var result = '';
-    for (var i = 0; i < str.length; i++) {
-      result += str.charCodeAt(i).toString(16);
+  async openApp(data: App) {
+    // this.dialog.open(AppWindowComponent, {
+    //   width: '2000px',
+    //   maxHeight: '100vh',
+    //   maxWidth: '100vw',
+    //   panelClass: 'app-full-bleed-dialog',
+    //   data,
+    // });
+    if (this.loadService.loadedChains.value) {
+      let injectedSigner = (await this.signerService.getSigner(
+        0,
+        this.loadService.loadedChains.value,
+        data.defaultChain ?? 1
+      )) as string;
+      if (injectedSigner) {
+        console.log(injectedSigner)
+        ThredMobilePlugin.openApp(
+          JSON.parse(JSON.stringify({ app: data, signer: injectedSigner }))
+        );
+      }
     }
-    return result;
   }
 
-
   async ngOnInit() {
-    
-
-    console.log("oi cunt")
+    console.log('oi cunt');
     this.loadService.loadedUser.subscribe((user) => {
       this.uid = user?.id;
       // if (!user){
       //   this.routeToAuth()
       // }
     });
+
+    this.loadService.loadedChains.subscribe(async (chains) => {
+      if (chains && chains.length > 0) {
+        let nativeSigner = (await this.signerService.getSigner(
+          1,
+          chains,
+          Number((window as any)?.ethereum?.networkVersion ?? '1')
+        )) as ThredSigner;
+        console.log(nativeSigner);
+        try {
+          let w = window as any;
+          if (nativeSigner && w) {
+            w.thred = nativeSigner;
+          }
+        } catch (error) {
+          console.log((error as any).message);
+        }
+      }
+    });
+
     document.body.classList.add('bar');
 
     // if ((window as any).newInstance ?? false) {
     //   this.butterfly?.beginFlyAnimation();
     // }
-  }
 
-  async initApp(title = 'App') {
-    let url =
-      window.location.pathname == '/' ? '/home' : window.location.pathname;
+    const myPluginEventListener = await ThredMobilePlugin.addListener(
+      'newTransaction',
+      (data: any) => {
+        let request = JSON.parse(data.request);
+        let id = data.id;
+        //MUST DO CHECKS FOR REAL TX AND SIGS
 
-    this.title = this.tabs.find((tab) => tab.link == url)?.name ?? title;
-    this.signedIn = this.uid != undefined;
+        this.loadService.sendRequest(request, (result) => {
+          console.log(result);
+          ThredMobilePlugin.sendResponse({ data: result, id });
+        });
+
+        console.log(request);
+      }
+    );
   }
 
   isLocation(locations: string[]) {

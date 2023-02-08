@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14111" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+    <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
         <!--Bridge View Controller-->
@@ -14,6 +14,50 @@
                 <viewController id="BYZ-38-t0r" customClass="CAPBridgeViewController" customModule="Capacitor" sceneMemberID="viewController"/>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="139" y="-2"/>
+        </scene>
+        <!--App Controller-->
+        <scene sceneID="Gdj-nf-dFD">
+            <objects>
+                <viewController storyboardIdentifier="app" id="307-pb-4n0" customClass="AppController" customModule="App" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="dgg-ka-jhK"/>
+                        <viewControllerLayoutGuide type="bottom" id="I7d-WJ-9Q7"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="EjN-Jt-8Gf">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <wkWebView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="df8-yU-7TX">
+                                <rect key="frame" x="0.0" y="47" width="375" height="731"/>
+                                <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <wkWebViewConfiguration key="configuration" allowsInlineMediaPlayback="YES">
+                                    <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" audio="YES" video="YES"/>
+                                    <wkPreferences key="preferences"/>
+                                </wkWebViewConfiguration>
+                            </wkWebView>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="df8-yU-7TX" firstAttribute="top" secondItem="dgg-ka-jhK" secondAttribute="bottom" id="H3c-f0-h34"/>
+                            <constraint firstItem="df8-yU-7TX" firstAttribute="leading" secondItem="EjN-Jt-8Gf" secondAttribute="leading" id="Zu3-8A-9lf"/>
+                            <constraint firstItem="I7d-WJ-9Q7" firstAttribute="top" secondItem="df8-yU-7TX" secondAttribute="bottom" id="cC3-ga-a7B"/>
+                            <constraint firstAttribute="trailing" secondItem="df8-yU-7TX" secondAttribute="trailing" id="dQW-TY-0RO"/>
+                            <constraint firstItem="df8-yU-7TX" firstAttribute="centerX" secondItem="EjN-Jt-8Gf" secondAttribute="centerX" id="fOC-AC-d4B"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="webView" destination="df8-yU-7TX" id="fDe-yd-ThM"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="hsQ-EC-laQ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1012" y="-2"/>
         </scene>
     </scenes>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
 </document>

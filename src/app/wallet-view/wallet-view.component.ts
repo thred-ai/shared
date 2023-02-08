@@ -15,7 +15,6 @@ import {
 } from 'thred-core';
 import { AppComponent } from '../app.component';
 import { LoadService } from '../load.service';
-import { TransactionDialogComponent } from '../transaction-dialog/transaction-dialog.component';
 import { SafeArea } from 'capacitor-plugin-safe-area';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
@@ -33,41 +32,32 @@ export class WalletViewComponent implements OnInit {
     private _bottomSheet: MatBottomSheet,
     private dialog: MatDialog
   ) {
-    (window as any).thred_request = this.thred_request;
+    // (window as any).thred_request = this.thred_request;
   }
 
-  thred_request = async (data: string) => {
-    return new Promise(async (resolve, reject) => {
-      let ref = this._bottomSheet.open(TransactionDialogComponent, { data });
+  // thred_request = async (data: string) => {
+  //   return new Promise(async (resolve, reject) => {
+  //     let ref = this._bottomSheet.open(TransactionDialogComponent, { data });
 
-      ref.afterDismissed().subscribe((result) => {
-        if (result && result !== '') {
-          this.loadService.setRequest(data, resolve);
-        } else {
-          resolve('rejected');
-        }
-      });
-      // let result = await (
-      //   window as any
-      // ).webkit.messageHandlers.thred_request.postMessage(data);
+  //     ref.afterDismissed().subscribe((result) => {
+  //       if (result && result !== '') {
+  //         this.loadService.setRequest(data, resolve);
+  //       } else {
+  //         resolve('rejected');
+  //       }
+  //     });
+  //     // let result = await (
+  //     //   window as any
+  //     // ).webkit.messageHandlers.thred_request.postMessage(data);
 
-      // if (result == '"rejected"') {
-      //   resolve(result);
-      // } else {
-      //   (window as any).sendRequest(data, resolve);
-      // }
-    });
-  };
+  //     // if (result == '"rejected"') {
+  //     //   resolve(result);
+  //     // } else {
+  //     //   (window as any).sendRequest(data, resolve);
+  //     // }
+  //   });
+  // };
 
-  openApp(data: any) {
-    // this.dialog.open(AppWindowComponent, {
-    //   width: '2000px',
-    //   maxHeight: '100vh',
-    //   maxWidth: '100vw',
-    //   panelClass: 'app-full-bleed-dialog',
-    //   data,
-    // });
-  }
 
   activeWallet?: Wallet;
   user?: User;
@@ -524,7 +514,8 @@ export class WalletViewComponent implements OnInit {
     console.log(JSON.stringify(event));
     if (event.type == 8 && event.data) {
       // (window as any)?.openApp(JSON.parse(JSON.stringify(event.data)));
-      this.openApp(event.data);
+      this.root.openApp(event.data)
+
     }
   }
 

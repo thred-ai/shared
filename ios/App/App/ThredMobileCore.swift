@@ -8,23 +8,127 @@
 import Capacitor
 import MaterialComponents.MaterialBottomSheet
 
-@objc(PluginTest)
+@objc(ThredMobileCore)
 public class ThredMobileCore: CAPPlugin {
+    
+    var appVC: AppController?
+    
+    func initController(storyboard: String, vc: String) -> UIViewController?{
+        let storyboard = UIStoryboard(name: storyboard, bundle: nil)
+        return storyboard.instantiateViewController(withIdentifier: vc)
+    }
+    
+    var handlers = [String : ((Any) -> ())]()
+    
+    
+    @objc func sendResponse(_ call: CAPPluginCall) {
+        if let id = call.getString("id"), let data = call.getString("data"), let replyHandler = handlers[id]{
+            print(id)
+            print(data)
+            replyHandler(data)
+            handlers[id] = nil
+        }
+    }
+    
+    func confirmTransaction(txData: String, replyHandler: @escaping (Any) -> ()){
+        if let vc = self.bridge?.viewController as? CAPBridgeViewController, let mainApp = vc.webView{
+            
+            let uuid = UUID().uuidString
+            
+            self.handlers[uuid] = replyHandler
+
+            self.notifyListeners("newTransaction", data: ["request": txData, "id": uuid])
+
+//            if method == "personal_sign" && !params.isEmpty{
+//                let msg = params[0] as? String ?? "No Message"
+//
+//    //                thredCore?.
+//    //                self.handler = { signed in
+//    //                    if (signed){
+//    //                        vc.postMessage(data: messageBody, replyHandler: { data in
+//    //                            replyHandler( data, nil )
+//    //                        })
+//    //                    }
+//    //                    else{
+//    //                        let err = """
+//    //                        "rejected"
+//    //                        """
+//    //                        print(err)
+//    //                        replyHandler(err, nil)
+//    //                    }
+//    //                    self.handler = nil
+//    //                }
+//
+//            }
+//            else if method == "eth_signTypedData_v4" && !params.isEmpty{
+//    //            guard let dataParams = params[1] as? [String:Any], let msg = dataParams["message"] as? [String:Any] else{ replyHandler(nil, nil); return }
+//    //                self.handler = { signed in
+//    //                    if (signed){
+//    //                        vc.postMessage(data: messageBody, replyHandler: { data in
+//    //                            replyHandler( data, nil )
+//    //                        })
+//    //                    }
+//    //                    else{
+//    //                        let err = """
+//    //                        "rejected"
+//    //                        """
+//    //                        print(err)
+//    //                        replyHandler(err, nil)
+//    //                    }
+//    //                    self.handler = nil
+//    //                }
+//    //                self.showPopup(text: msg, title: "Sign Message", value: nil, currency: nil)
+//            }
+//            else if method == "eth_sendTransaction" && !params.isEmpty{
+//
+//    //                self.handler = { signed in
+//    //                    if (signed){
+//    //                        vc.postMessage(data: messageBody, replyHandler: { data in
+//    //                            replyHandler( data, nil )
+//    //                        })
+//    //                    }
+//    //                    else{
+//    //                        let err = """
+//    //                        "rejected"
+//    //                        """
+//    //                        print(err)
+//    //                        replyHandler(err, nil)
+//    //                    }
+//    //                    self.handler = nil
+//    //                }
+//    //                self.showPopup(text: customMessage(data: json), title: "Transaction Details", value: json["displayValue"] as? String ?? "0", currency: json["symbol"] as? String)
+//
+//            }
+//            else{
+//    //                vc.postMessage(data: messageBody, replyHandler: { data in
+//    //                    replyHandler( data, nil )
+//    //                })
+//            }
+        }
+    }
+    
     
     @objc func setWallet(_ call: CAPPluginCall) {
         
     }
     
+    
     @objc func getWallet(_ call: CAPPluginCall) {
-        
+          
     }
     
     @objc func openApp(_ call: CAPPluginCall) {
-        if let app = call.getString("appData"), let vc = bridge?.viewController as? CAPBridgeViewController{
-            DispatchQueue.main.async{
-                let viewController: AppController = AppController()
-
-                vc.present(viewController, animated: true, completion: nil)
+        print("open app")
+        DispatchQueue.main.async{
+            if let data = call.getObject("app"), let signer = call.getString("signer"), let vc = self.bridge?.viewController as? CAPBridgeViewController, let appVC = self.initController(storyboard: "Main", vc: "app") as? AppController{
+                self.appVC = appVC
+                print(data)
+                print(signer)
+                appVC.app = data
+                appVC.injectedSigner = signer
+                appVC.thredCore = self
+                vc.present(appVC, animated: true, completion: nil)
+                
             }
         }
     }

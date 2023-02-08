@@ -25,6 +25,7 @@ import {
   User,
   Wallet,
 } from 'thred-core';
+import { SignerService } from './signer.service';
 
 export interface Dict<T> {
   [key: string]: T;
@@ -49,7 +50,7 @@ export class LoadService {
     private db: AngularFirestore,
     private functions: AngularFireFunctions,
     private storage: AngularFireStorage,
-    public thredService: ThredCoreService
+    public thredService: ThredCoreService,
   ) {
 
     firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
@@ -57,19 +58,8 @@ export class LoadService {
     // this.auth.signOut();
     this.initProviders();
 
-    this.getSigners((signers) => {
-      if (!signers) {
-        return;
-      }
-      // let injectedSigner = signers?.injectedSigner;
-      let nativeSigner = signers?.nativeSigner;
-
-      // (window as any).webkit?.messageHandlers.signers.postMessage(
-      //   injectedSigner
-      // );
-
-      eval(nativeSigner);
-    });
+    
+    
 
   }
 
@@ -92,12 +82,12 @@ export class LoadService {
     return str;
   }
 
-  async setRequest(
-    data: string,
-    callback: (result: string | null) => any = (window as any)?.reqResponse
+  async sendRequest(
+    data: any,
+    callback: (result: string) => any = (window as any)?.reqResponse
   ) {
     try {
-      let payload = JSON.parse(data);
+      let payload = data;
       // payload.id = await (window as any).thred();
       payload.wallet = this.loadedWallet.value?.id;
       console.log(JSON.stringify(payload));
@@ -121,7 +111,7 @@ export class LoadService {
     } catch (error: any) {
       console.log(error.message);
       console.log(JSON.stringify(error));
-      callback(null);
+      callback(JSON.stringify({ success: false, error, data: null }));
     }
 
     // .subscribe(
@@ -882,32 +872,6 @@ export class LoadService {
     }
   }
 
-  getSigners(
-    callback: (result?: { injectedSigner: string; nativeSigner: string }) => any
-  ) {
-    try {
-      this.functions
-        .httpsCallable('getSigners')({})
-        .pipe(first())
-        .toPromise()
-        .then((resp) => {
-          if (resp) {
-            //
-            callback({
-              injectedSigner: resp.signer1 as string,
-              nativeSigner: resp.signer2 as string,
-            });
-          }
-        })
-        .catch((error) => {
-          callback();
-        });
-    } catch (error: any) {
-      console.log(error.message);
-      console.log(JSON.stringify(error));
-      callback();
-    }
-  }
 
   getTokensForNetwork(
     chain: number,
@@ -999,7 +963,6 @@ export class LoadService {
         async (resp) => {
           // this.loadedChains.next(resp);
           console.log('chains oy');
-          console.log(JSON.stringify(this.loadedChains.value));
           let util = this.thredService.syncWallet(
             resp,
             this.loadedChains.value
