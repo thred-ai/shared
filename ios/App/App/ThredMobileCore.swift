@@ -27,7 +27,7 @@ public class ThredMobileCore: CAPPlugin {
             print(data)
             replyHandler(data)
             handlers[id] = nil
-        }
+        }//
     }
     
     func confirmTransaction(txData: String, replyHandler: @escaping (Any) -> ()){
