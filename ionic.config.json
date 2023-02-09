@@ -2,7 +2,9 @@
   "projects": {
     "ThredMobile": {
       "name": "ThredMobile",
-      "integrations": {},
+      "integrations": {
+        "capacitor": {}
+      },
       "type": "angular"
     }
   },
