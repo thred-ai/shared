@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ethers } from 'ethers';
 import { Chain, ERC20 } from 'thred-core';
 import { AppComponent } from '../app.component';
+import { AuthService } from '../auth.service';
 import { LoadService } from '../load.service';
 
 @Component({
@@ -13,6 +14,7 @@ import { LoadService } from '../load.service';
 export class NetworkComponent implements OnInit {
   constructor(
     private loadService: LoadService,
+    private authService: AuthService,
     private root: AppComponent,
     private _router: ActivatedRoute
   ) {}
@@ -23,7 +25,7 @@ export class NetworkComponent implements OnInit {
   chain?: Chain;
 
   async ngOnInit() {
-    let signedInUser = (await this.loadService.currentUser)?.uid;
+    let signedInUser = (await this.authService.currentUser)?.uid;
     if (signedInUser) {
       this.loading = true;
       this.loadService.loadedChains.subscribe(async (chains) => {

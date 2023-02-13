@@ -80,8 +80,8 @@ import { NumValuePipe } from './num-value.pipe';
 import { CollectionCarouselComponent } from './collection-carousel/collection-carousel.component';
 import { TransactionDialogComponent } from './transaction-dialog/transaction-dialog.component';
 import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
-import { ThredCoreModule } from 'thred-core';
 import { CommonModule } from '@angular/common';
+import { ThredCoreModule } from 'thred-core';
 
 @NgModule({
   declarations: [
@@ -102,6 +102,7 @@ import { CommonModule } from '@angular/common';
     TransactionDialogComponent
   ],
   imports: [
+    //@ts-ignore
     CommonModule,
     ReactiveFormsModule,
     BrowserModule.withServerTransition({ appId: 'serverApp' }),

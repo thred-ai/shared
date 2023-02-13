@@ -3,7 +3,6 @@ import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
 import { ethers } from 'ethers';
 import { environment } from 'src/environments/environment';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFirestore, DocumentData } from '@angular/fire/compat/firestore';
 import { AngularFireFunctions } from '@angular/fire/compat/functions';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
@@ -13,7 +12,6 @@ import { Alchemy, AlchemyProvider } from 'alchemy-sdk';
 import { BehaviorSubject, Observable } from 'rxjs';
 import crypto from 'crypto';
 import md5 from 'blueimp-md5';
-import { AppComponent } from './app.component';
 import {
   App,
   Chain,
@@ -25,7 +23,7 @@ import {
   User,
   Wallet,
 } from 'thred-core';
-import { SignerService } from './signer.service';
+import { AuthService } from './auth.service';
 
 export interface Dict<T> {
   [key: string]: T;
@@ -46,11 +44,11 @@ export class LoadService {
   constructor(
     @Inject(PLATFORM_ID) private platformID: Object,
     private router: Router,
-    private auth: AngularFireAuth,
     private db: AngularFirestore,
     private functions: AngularFireFunctions,
     private storage: AngularFireStorage,
     public thredService: ThredCoreService,
+    private authService: AuthService,
   ) {
 
     firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
@@ -180,77 +178,6 @@ export class LoadService {
     }
   }
 
-  finishSignUp(
-    encryption: string,
-    wallet: string,
-    callback: (result: { status: boolean; msg: string; hex?: any }) => any
-  ) {
-    this.createUser(encryption, wallet, (user, hex) => {
-      if (user && hex) {
-        callback({ status: true, msg: 'success', hex });
-      } else {
-        callback({
-          status: false,
-          msg: 'Something went wrong. Please try again',
-        });
-      }
-    });
-  }
-
-  finishSignIn(
-    encryption: string,
-    wallet: string,
-    callback: (result: { status: boolean; msg: string; hex?: any }) => any
-  ) {
-    this.signInUser(encryption, wallet, (user, hex) => {
-      if (user && hex) {
-        callback({ status: true, msg: 'success', hex });
-      } else {
-        callback({
-          status: false,
-          msg: 'Invalid Credentials. Please try again',
-        });
-      }
-    });
-  }
-
-  finishImport(
-    encryption: string,
-    wallet: string,
-    callback: (result: { status: boolean; msg: string; hex?: any }) => any
-  ) {
-    this.importUser(encryption, wallet, (user, hex) => {
-      if (user && hex) {
-        callback({ status: true, msg: 'success', hex });
-      } else {
-        callback({
-          status: false,
-          msg: 'Invalid Credentials. Please try again',
-        });
-      }
-    });
-  }
-
-  finishNew(
-    wallet: string,
-    callback: (result: { status: boolean; msg: string; hex?: any }) => any
-  ) {
-    this.newUser(wallet, (user, hex) => {
-      if (user && hex) {
-        callback({ status: true, msg: 'success', hex });
-      } else {
-        callback({
-          status: false,
-          msg: 'Invalid Credentials. Please try again',
-        });
-      }
-    });
-  }
-
-  finishPassReset(
-    email: string,
-    callback: (result: { status: boolean; msg: string }) => any
-  ) {}
 
   openItem(id: string) {
     this.router.navigateByUrl(`/apps/${id}`);
@@ -276,65 +203,19 @@ export class LoadService {
     this.router.navigateByUrl(`/home`);
   }
 
-  get currentUser() {
-    return this.auth.authState.pipe(first()).toPromise();
-  }
-
-  async signOut(root: AppComponent, callback: (result: boolean) => any) {
-    try {
-      //console.log("SIGNING OUT")
-      await this.auth.signOut();
-      await (window as any).webkit.messageHandlers.remove_key.postMessage('');
-      root.signedIn = false;
-      root.uid = undefined;
-      callback(true);
-    } catch (error) {
-      callback(false);
-    }
-  }
-
-  getCoreABI(
-    chainId = 1,
-    callback: (result?: { address: string; abi: any[] }) => any
-  ) {
-    var query = this.db.collection('Protocol');
-
-    let sub = query.valueChanges().subscribe((docs) => {
-      sub.unsubscribe();
-      let doc = docs[0] as DocumentData;
-
-      if (doc) {
-        let addresses = doc['Addresses'] as any[];
-
-        let address = addresses.find((a) => a.id == chainId).address as string;
-
-        let abi = doc['ABI'] as any[];
-        callback({ address, abi });
-      } else {
-        callback();
-      }
-    });
-  }
-
-  installApp(sig: string, id: string, callback: (success: boolean) => any) {
-    this.functions
-      .httpsCallable('installApps')({ sig, id })
-      .pipe(first())
-      .subscribe(async (resp) => {
-        callback(resp);
-      });
-  }
 
   async getChains(
     getBalances = false,
     wallet: string | undefined = undefined,
     callback: (result: Chain[]) => any
   ) {
-    console.log('USER -- ' + JSON.stringify((await this.currentUser)?.uid));
+    console.log("chains")
+    console.log(getBalances)
+    console.log(wallet)
+
     // let thred = (window as any)?.thred;
     this.functions
       .httpsCallable('getChainsForWallet')({
-        wallet,
         getBalances,
       })
       .pipe(first())
@@ -383,268 +264,6 @@ export class LoadService {
     }
   }
 
-  // send(reqData: string) {
-  //   this.functions
-  //     .httpsCallable('transact')(reqData)
-  //     .pipe(first())
-  //     .subscribe(async (resp) => {
-  //       (window as any)?.reqResponse(JSON.stringify(resp));
-  //     });
-  // }
-
-  createUser(
-    hex: string,
-    wallet: string,
-    callback: (user?: User, hex?: any) => any
-  ) {
-    this.functions
-      .httpsCallable('createNewUser')({ id: hex, isEmail: true, wallet })
-      .pipe(first())
-      .subscribe(
-        async (resp) => {
-          if (resp as any) {
-            let success = resp.success as boolean;
-            if (success) {
-              let userData = resp.userData as any;
-              let token = resp.token as string;
-              let id = resp.id as string;
-
-              if (userData && token) {
-                this.auth
-                  .signInWithCustomToken(token)
-                  .then((userRecord) => {
-                    let user = new User(
-                      userData.name,
-                      userData.uid,
-                      [],
-                      userData.joined,
-                      userData.url,
-                      userData.email,
-                      userData.registeredWallets
-                    );
-                    callback(user, id);
-                  })
-                  .catch((err: Error) => {
-                    //console.log(err);
-                    callback();
-                  });
-              } else {
-                callback();
-              }
-            } else {
-              callback();
-            }
-          } else {
-            callback();
-          }
-        },
-        (err) => {
-          console.error({ err });
-          callback();
-        }
-      );
-  }
-
-  signInUser(
-    hex: string,
-    wallet: string,
-    callback: (user?: User, hex?: any) => any
-  ) {
-    this.functions
-      .httpsCallable('signInUser')({ id: hex, isEmail: true, wallet })
-      .pipe(first())
-      .subscribe(
-        async (resp) => {
-          if (resp as any) {
-            let success = resp.success as boolean;
-            if (success) {
-              let userData = resp.userData as any;
-              let token = resp.token as string;
-              let id = resp.id as string;
-
-              if (userData && token && id) {
-                this.auth
-                  .signInWithCustomToken(token)
-                  .then((userRecord) => {
-                    let user = new User(
-                      userData.name,
-                      userData.uid,
-                      [],
-                      userData.joined,
-                      userData.url,
-                      userData.email,
-                      userData.registeredWallets
-                    );
-                    callback(user, id);
-                  })
-                  .catch((err: Error) => {
-                    //
-                  });
-              } else {
-                callback();
-              }
-            } else {
-              callback();
-            }
-          } else {
-            callback();
-          }
-        },
-        (err) => {
-          console.error({ err });
-          callback();
-        }
-      );
-  }
-
-  verifyUser(hex: string, callback: (user?: User, hex?: any) => any) {
-    this.functions
-      .httpsCallable('verifyUser')({ id: hex })
-      .pipe(first())
-      .subscribe(
-        async (resp) => {
-          if (resp as any) {
-            let success = resp.success as boolean;
-            if (success) {
-              let userData = resp.userData as any;
-              let token = resp.token as string;
-              let id = resp.id as string;
-
-              if (userData && token && id) {
-                this.auth
-                  .signInWithCustomToken(token)
-                  .then((userRecord) => {
-                    let user = new User(
-                      userData.name,
-                      userData.uid,
-                      [],
-                      userData.joined,
-                      userData.url,
-                      userData.email,
-                      userData.registeredWallets
-                    );
-                    callback(user, id);
-                  })
-                  .catch((err: Error) => {
-                    //
-                  });
-              } else {
-                callback();
-              }
-            } else {
-              callback();
-            }
-          } else {
-            callback();
-          }
-        },
-        (err) => {
-          console.error({ err });
-          callback();
-        }
-      );
-  }
-
-  importUser(
-    hex: string,
-    wallet: string,
-    callback: (user?: User, hex?: any) => any
-  ) {
-    this.functions
-      .httpsCallable('signInUser')({ id: hex, isEmail: false, wallet })
-      .pipe(first())
-      .subscribe(
-        async (resp) => {
-          if (resp as any) {
-            let success = resp.success as boolean;
-            if (success) {
-              let userData = resp.userData as any;
-              let token = resp.token as string;
-              let id = resp.id as string;
-
-              if (userData && token && id) {
-                this.auth
-                  .signInWithCustomToken(token)
-                  .then((userRecord) => {
-                    let user = new User(
-                      userData.name,
-                      userData.uid,
-                      [],
-                      userData.joined,
-                      userData.url,
-                      userData.email,
-                      userData.registeredWallets
-                    );
-                    callback(user, id);
-                  })
-                  .catch((err: Error) => {
-                    //
-                  });
-              } else {
-                callback();
-              }
-            } else {
-              callback();
-            }
-          } else {
-            callback();
-          }
-        },
-        (err) => {
-          console.error({ err });
-          callback();
-        }
-      );
-  }
-
-  newUser(wallet: string, callback: (user?: User, hex?: any) => any) {
-    this.functions
-      .httpsCallable('createNewUser')({ isEmail: false, wallet })
-      .pipe(first())
-      .subscribe(
-        async (resp) => {
-          if (resp as any) {
-            let success = resp.success as boolean;
-            if (success) {
-              let userData = resp.userData as any;
-              let token = resp.token as string;
-              let id = resp.id as string;
-
-              if (userData && token && id) {
-                this.auth
-                  .signInWithCustomToken(token)
-                  .then((userRecord) => {
-                    let user = new User(
-                      userData.name,
-                      userData.uid,
-                      [],
-                      userData.joined,
-                      userData.url,
-                      userData.email,
-                      userData.registeredWallets
-                    );
-                    callback(user, id);
-                  })
-                  .catch((err: Error) => {
-                    //console.log(err);
-                    callback();
-                  });
-              } else {
-                callback();
-              }
-            } else {
-              callback();
-            }
-          } else {
-            callback();
-          }
-        },
-        (err) => {
-          console.error({ err });
-          callback();
-        }
-      );
-  }
 
   filteredSearch: BehaviorSubject<any> = new BehaviorSubject([]);
 
@@ -693,92 +312,6 @@ export class LoadService {
   //     });
   // }
 
-  getItem(id: string, callback: (result?: App) => any, getProfiles = false) {
-    let sub2 = this.db
-      .collectionGroup(`Items`, (ref) => ref.where('id', '==', id))
-      .valueChanges()
-      .subscribe((docs2) => {
-        sub2.unsubscribe();
-
-        let docs_2 = docs2 as any[];
-
-        let d = docs_2[0];
-
-        if (d) {
-          let util = d as App;
-
-          // d.chains.forEach((c: any, i: number) => {
-          //   d.chains[i] = this.chains.find((x) => x.id == c);
-          // });
-          if (getProfiles) {
-            // this.getUserInfo(d.creator, false, false, (result) => {
-            //   if (result) {
-            //     util.creatorName = result.name;
-            //   }
-            //   callback(util);
-            // });
-          } else {
-            callback(util);
-          }
-        } else {
-          callback(undefined);
-        }
-      });
-  }
-
-  getItems(ids: string[], callback: (result?: App[]) => any) {
-    ids = ids.concat('0');
-
-    let sub2 = this.db
-      .collectionGroup(`Items`, (ref) => ref.where('id', 'in', ids))
-      .valueChanges()
-      .subscribe((docs3) => {
-        let docs = docs3 as DocumentData[];
-
-        let result: App[] = [];
-
-        docs.forEach((d) => {
-          let util = d as App;
-
-          // util.chains.forEach((c: any, i: number) => {
-          //   util.chains[i] = this.chains.find((x) => x.id == c)!;
-          // });
-
-          result.push(util);
-        });
-        callback(result);
-      });
-  }
-
-  get newAppID() {
-    return this.db.createId();
-  }
-
-  getFeaturedItem(callback: (result?: App) => any) {
-    let sub2 = this.db
-      .collectionGroup(`Engage`)
-      .valueChanges()
-      .subscribe((docs2) => {
-        sub2.unsubscribe();
-
-        let docs_2 = docs2 as any[];
-
-        let d = docs_2[0];
-
-        if (d) {
-          let featured = d['Featured'] as string;
-          this.getItem(
-            featured,
-            (result) => {
-              callback(result);
-            },
-            true
-          );
-        } else {
-          callback(undefined);
-        }
-      });
-  }
 
   getUserInfo(
     uid: string,
@@ -803,7 +336,7 @@ export class LoadService {
         let address = doc['address'] as string;
         let url = doc['url'] as string;
         let registeredWallets = doc['registeredWallets'] as string[];
-        let myUID = (await this.currentUser)?.uid;
+        let myUID = (await this.authService.currentUser)?.uid;
         if (isPlatformBrowser(this.platformID) && uid == myUID) {
           localStorage['url'] = url;
           localStorage['name'] = name;
@@ -914,6 +447,7 @@ export class LoadService {
   }
 
   async loadNFTs(nftList: NFTList, callback: (nfts: NFT[]) => any) {
+    console.log("nfts")
     this.functions
       .httpsCallable('getNFTsForWallet')({ nftList })
       .pipe(first())
@@ -930,6 +464,7 @@ export class LoadService {
   }
 
   async loadNFTsByWallet(uid: string, callback: (nfts: NFT[]) => any) {
+    console.log("nfts wallet")
     if (uid) {
       this.functions
         .httpsCallable('getNFTsByWallet')({ uid })
@@ -954,7 +489,7 @@ export class LoadService {
     callback: (result?: Wallet) => any,
     getProfiles = false
   ) {
-    console.log(id);
+    console.log("wallet");
 
     this.functions
       .httpsCallable('getWallet')({ id })

@@ -7,6 +7,7 @@
       [currentPage]="activePage"
       [defaultItems]="{ '6': loadedNFTs, '7': activeWallet.chains }"
       (pageChanged)="pageChanged($event)"
+      [pageDetails]="{}"
       [accountDetails]="activePage.page.type == 2 ? {user} : undefined"
       (refreshed)="reload()"
       (clickedItem)="handleClick($event)"
@@ -21,6 +22,7 @@
       [layout]="activeLayout"
       [currentPage]="{ page: activeLayout.authPage, index: 0 }"
       [authDetails]="authDetails"
+      [pageDetails]="{}"
       (authUpdated)="parseAuth($event)"
       [safeArea]="{bottom: safeAreaBottom, top: safeAreaTop}"
     >

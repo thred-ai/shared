@@ -17,15 +17,18 @@ import { AppComponent } from '../app.component';
 import { LoadService } from '../load.service';
 import { SafeArea } from 'capacitor-plugin-safe-area';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-wallet-view',
   templateUrl: './wallet-view.component.html',
   styleUrls: ['./wallet-view.component.scss'],
 })
+//@ts-ignore
 export class WalletViewComponent implements OnInit {
   constructor(
     private loadService: LoadService,
+    private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router,
     private root: AppComponent,
@@ -57,7 +60,6 @@ export class WalletViewComponent implements OnInit {
   //     // }
   //   });
   // };
-
 
   activeWallet?: Wallet;
   user?: User;
@@ -130,7 +132,7 @@ export class WalletViewComponent implements OnInit {
 
   reload() {
     // (window as any).webkit.messageHandlers.vibrate.postMessage({});
-    this.vibrate()
+    this.vibrate();
     setTimeout(() => {
       window.location.reload();
     }, 1000); //
@@ -278,8 +280,7 @@ export class WalletViewComponent implements OnInit {
     this.initLoad();
   }
 
-
-  async vibrate(){
+  async vibrate() {
     await Haptics.impact({ style: ImpactStyle.Medium });
   }
 
@@ -300,7 +301,7 @@ export class WalletViewComponent implements OnInit {
 
       let hex = `${v}.${d}`;
 
-      this.loadService.finishSignUp(hex, this.activeWallet?.id, (result) => {
+      this.authService.finishSignUp(hex, this.activeWallet?.id, (result) => {
         if (result.status && result.hex) {
           this.initializeUser(result.hex);
         }
@@ -328,7 +329,7 @@ export class WalletViewComponent implements OnInit {
       let hex = `${v}.${d}`;
 
       if (this.activeWallet) {
-        this.loadService.finishSignIn(hex, this.activeWallet?.id, (result) => {
+        this.authService.finishSignIn(hex, this.activeWallet?.id, (result) => {
           if (result.status && result.hex) {
             this.initializeUser(result.hex);
             // this.root.routeToProfile();
@@ -355,7 +356,7 @@ export class WalletViewComponent implements OnInit {
       let hex = `${v}.${d}`;
 
       if (this.activeWallet) {
-        this.loadService.finishImport(hex, this.activeWallet?.id, (result) => {
+        this.authService.finishImport(hex, this.activeWallet?.id, (result) => {
           if (result.status && result.hex) {
             this.initializeUser(result.hex);
             // this.root.routeToProfile();
@@ -370,7 +371,7 @@ export class WalletViewComponent implements OnInit {
     callback: (result: { status: boolean; msg: string }) => any
   ) {
     if (this.activeWallet) {
-      this.loadService.finishNew(this.activeWallet?.id, (result) => {
+      this.authService.finishNew(this.activeWallet?.id, (result) => {
         if (result.status && result.hex) {
           this.initializeUser(result.hex);
           // this.root.routeToProfile();
@@ -387,18 +388,16 @@ export class WalletViewComponent implements OnInit {
     let email = authData['email'];
   }
 
-  safeAreaTop = 0
-  safeAreaBottom = 0
+  safeAreaTop = 0;
+  safeAreaBottom = 0;
 
   async ngOnInit() {
-
     let insets = (await SafeArea.getSafeAreaInsets()).insets;
-    
-    this.safeAreaBottom = insets.bottom
 
-    this.safeAreaTop = (await SafeArea.getStatusBarHeight()).statusBarHeight
+    this.safeAreaBottom = insets.bottom;
 
-   
+    this.safeAreaTop = (await SafeArea.getStatusBarHeight()).statusBarHeight;
+
     // (window as any).webkit?.messageHandlers.colors.postMessage(body);
 
     console.log('ello');
@@ -433,23 +432,23 @@ export class WalletViewComponent implements OnInit {
         console.log(JSON.stringify(wallet.chains));
         this.loading = false;
         this.wallet = wallet;
-        let user = await this.loadService.currentUser;
-              if (user) {
-                console.log('LOADING USER');
-                this.signedIn = true
-                this.loadService.getUserInfo(
-                  user.uid,
-                  wallet.id,
-                  false,
-                  false,
-                  (user) => {
-                    this.loadService.loadedUser.next(user ?? null);
-                  }
-                );
-              } else {
-                console.log('NO USER');
-                this.signedIn = false
-              }
+        let user = await this.authService.currentUser;
+        if (user) {
+          console.log('LOADING USER');
+          this.signedIn = true;
+          this.loadService.getUserInfo(
+            user.uid,
+            wallet.id,
+            false,
+            false,
+            (user) => {
+              this.loadService.loadedUser.next(user ?? null);
+            }
+          );
+        } else {
+          console.log('NO USER');
+          this.signedIn = false;
+        }
 
         // var hex: string | undefined = undefined;
         // if ((window as any)?.thred) {
@@ -514,8 +513,7 @@ export class WalletViewComponent implements OnInit {
     console.log(JSON.stringify(event));
     if (event.type == 8 && event.data) {
       // (window as any)?.openApp(JSON.parse(JSON.stringify(event.data)));
-      this.root.openApp(event.data)
-
+      this.root.openApp(event.data);
     }
   }
 
