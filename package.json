@@ -135,7 +135,7 @@
     "styled-components": "^5.3.5",
     "summernote": "^0.8.20",
     "svgdom": "^0.1.8",
-    "thred-core": "^0.3.71",
+    "thred-core": "^0.3.72",
     "thred-protocol-sdk": "^0.2.2",
     "ts-loader": "^9.4.2",
     "ts-node": "^10.9.1",
