@@ -6,7 +6,7 @@ const config: CapacitorConfig = {
   webDir: 'dist/thred-mobile',
   bundledWebRuntime: false,
   server: {
-    url: "wallet.thredwallet.com"
+    url: "https://wallet.thredwallet.com"
   }
 };
 

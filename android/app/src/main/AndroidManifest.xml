@@ -14,9 +14,6 @@
       android:name="TBridgeActivity"
       android:exported="false" />
     <activity
-      android:name=".AppController"
-      android:exported="false" />
-    <activity
       android:name=".MainActivity"
       android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode"
       android:exported="true"

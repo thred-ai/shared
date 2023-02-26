@@ -9,10 +9,10 @@ const routes: Routes = [
   // { path: 'edit', component: ProfileComponent, pathMatch: 'full' },
   // { path: 'store/:app', component: ItemCsomponent, pathMatch: 'full' },
   // { path: 'wallet/:id/:network', component: NetworkComponent, pathMatch: 'full' },
-  { path: 'wallet/:id', component: WalletViewComponent, pathMatch: 'full' },
+  { path: ':id', component: WalletViewComponent, pathMatch: 'full' },
 
 
-  { path: '', redirectTo: '/wallet/JZ4PYdx6bF6tZNwpcBMT', pathMatch: 'full' },
+  // { path: '', redirectTo: '/wallet/JZ4PYdx6bF6tZNwpcBMT', pathMatch: 'full' },
   // { path: '/:any', redirectTo: '/home', pathMatch: 'full' },
 
 ];

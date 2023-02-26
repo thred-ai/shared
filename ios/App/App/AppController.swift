@@ -15,7 +15,6 @@ class AppController: UIViewController, WKNavigationDelegate, WKScriptMessageHand
     var app: [String : Any]?
     var injectedSigner: String!
     var thredCore: ThredMobileCore?
-    var hidden = true
     
     @IBOutlet weak var webView: WKWebView!
     
@@ -28,7 +27,6 @@ class AppController: UIViewController, WKNavigationDelegate, WKScriptMessageHand
             let finalUrl = URLRequest(url: url)
             self.webView.load(finalUrl)
         }
-        // Do any additional setup after loading the view.
     }
     
     
@@ -90,16 +88,5 @@ class AppController: UIViewController, WKNavigationDelegate, WKScriptMessageHand
             "var head = document.getElementsByTagName('head')[0];" + "head.appendChild(meta);"
         return WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
     }
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }
