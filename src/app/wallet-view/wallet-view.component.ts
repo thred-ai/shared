@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   App,
   Chain,
+  Dict,
   Layout,
   Media,
   NFT,
@@ -18,6 +19,7 @@ import { LoadService } from '../load.service';
 import { SafeArea } from 'capacitor-plugin-safe-area';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { AuthService } from '../auth.service';
+import { ThredMobilePlugin } from 'src/ThredCorePlugin';
 
 @Component({
   selector: 'app-wallet-view',
@@ -32,37 +34,12 @@ export class WalletViewComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private root: AppComponent,
-    private _bottomSheet: MatBottomSheet,
-    private dialog: MatDialog
-  ) {
-    // (window as any).thred_request = this.thred_request;
-  }
-
-  // thred_request = async (data: string) => {
-  //   return new Promise(async (resolve, reject) => {
-  //     let ref = this._bottomSheet.open(TransactionDialogComponent, { data });
-
-  //     ref.afterDismissed().subscribe((result) => {
-  //       if (result && result !== '') {
-  //         this.loadService.setRequest(data, resolve);
-  //       } else {
-  //         resolve('rejected');
-  //       }
-  //     });
-  //     // let result = await (
-  //     //   window as any
-  //     // ).webkit.messageHandlers.thred_request.postMessage(data);
-
-  //     // if (result == '"rejected"') {
-  //     //   resolve(result);
-  //     // } else {
-  //     //   (window as any).sendRequest(data, resolve);
-  //     // }
-  //   });
-  // };
+    private cdr: ChangeDetectorRef
+  ) {}
 
   activeWallet?: Wallet;
   user?: User;
+  layout: 'mobile' | 'desktop' | 'tablet' = 'mobile';
 
   activeLayout?: Layout;
 
@@ -89,8 +66,8 @@ export class WalletViewComponent implements OnInit {
 
     if (value) {
       try {
-        this.activeLayout = this.activeWallet.activeLayouts['mobile'];
-        console.log(JSON.stringify(this.activeLayout));
+        console.log(this.layout);
+        this.activeLayout = this.activeWallet.activeLayouts[this.layout];
         const pageIndex = Number(
           this.route.snapshot.queryParamMap.get('page') ?? 0
         );
@@ -212,7 +189,6 @@ export class WalletViewComponent implements OnInit {
 
   parseAuth(event: { type: string; data: any } | any) {
     // this.authDetails
-    console.log(event);
     if (event.type == 'error') {
       this.authDetails.err = event.data;
     } else if (event.type == 'sign_in') {
@@ -347,7 +323,6 @@ export class WalletViewComponent implements OnInit {
     let key = authData['key'];
 
     let data = this.loadService.encryptData(`$${JSON.stringify({ key })}$`);
-    console.log(key);
     //
     if (data) {
       let d = data.d;
@@ -359,7 +334,6 @@ export class WalletViewComponent implements OnInit {
         this.authService.finishImport(hex, this.activeWallet?.id, (result) => {
           if (result.status && result.hex) {
             this.initializeUser(result.hex);
-            // this.root.routeToProfile();
           }
           callback(result);
         });
@@ -398,15 +372,14 @@ export class WalletViewComponent implements OnInit {
 
     this.safeAreaTop = (await SafeArea.getStatusBarHeight()).statusBarHeight;
 
+    this.setListeners();
+
     // (window as any).webkit?.messageHandlers.colors.postMessage(body);
 
-    console.log('ello');
     let id = await this.getId();
-    console.log(id);
 
     this.loadService.loadedChains.subscribe((chains) => {
       this.chains = chains ?? [];
-      console.log(this.chains);
       if (chains.length > 0) {
         if (this.activeWallet == undefined) {
           this.loadService.getWallet(id, (wallet) => {
@@ -426,15 +399,15 @@ export class WalletViewComponent implements OnInit {
     });
     this.loadService.loadedWallet.subscribe(async (wallet) => {
       if (wallet) {
-        this.loading = true;
-
-        console.log('oy');
-        console.log(JSON.stringify(wallet.chains));
         this.loading = false;
+        // await Preferences.set({key: 'layout', value: 'desktop'})
+        // const { value } = await Preferences.get({ key: 'layout' });
+        // console.log("LAYOUT -- " + value)
+        this.layout = 'mobile';
+
         this.wallet = wallet;
         let user = await this.authService.currentUser;
         if (user) {
-          console.log('LOADING USER');
           this.signedIn = true;
           this.loadService.getUserInfo(
             user.uid,
@@ -446,49 +419,11 @@ export class WalletViewComponent implements OnInit {
             }
           );
         } else {
-          console.log('NO USER');
           this.signedIn = false;
         }
-
-        // var hex: string | undefined = undefined;
-        // if ((window as any)?.thred) {
-        //   hex = (await (window as any)?.thred()) as string;
-        // } else {
-        //   console.log('nah');
-        // }
-        // console.log('HEX');
-        // if (hex) {
-        //   // this.butterfly?.addRing();
-        //   this.loadService.verifyUser(hex, async (user, hex) => {
-        //     this.loading = false;
-        //     this.wallet = wallet;
-        //     if (user && hex) {
-        //       this.signedIn = true;
-        //       let user = await this.loadService.currentUser;
-        //       if (user) {
-        //         console.log('LOADING USER');
-        //         this.loadService.getUserInfo(
-        //           user.uid,
-        //           wallet.id,
-        //           false,
-        //           false,
-        //           (user) => {
-        //             this.loadService.loadedUser.next(user ?? null);
-        //           }
-        //         );
-        //       } else {
-        //         console.log('NO USER');
-        //       }
-        //     }
-        //   });
-        // } else {
-        //   console.log('OUT');
-        //   this.signedIn = false; //
-        //   this.loading = false;
-        //   this.wallet = wallet;
-        // }
       }
     });
+
     this.loadService.loadedNFTs.subscribe((nfts) => {
       this.loadedNFTs = nfts;
     });
@@ -496,29 +431,88 @@ export class WalletViewComponent implements OnInit {
       this.signedIn = user != null;
       this.user = user ?? undefined;
       if (user && this.activeWallet) {
-        console.log('LOADING CHAIN BALANCE');
         this.loadService.installChains(true, this.activeWallet.id);
         this.loadService.loadNFTsByWallet(user.id, (nfts) => {
           this.loadService.loadedNFTs.next(nfts ?? []);
         });
       } else {
-        console.log('LOADING CHAINS');
         this.loadService.installChains(false);
       }
     });
   }
 
   handleClick(event: { type: number; data: any }) {
-    console.log('oy');
-    console.log(JSON.stringify(event));
     if (event.type == 8 && event.data) {
-      // (window as any)?.openApp(JSON.parse(JSON.stringify(event.data)));
-      this.root.openApp(event.data);
+      this.root.openApp(event.data, {
+        bottom: this.safeAreaBottom,
+        top: this.safeAreaTop,
+      });
     }
   }
 
   async initLoad() {
     if (this.activeWallet)
       this.loadService.loadedWallet.next(this.activeWallet);
+  }
+
+  async setListeners() {
+    await ThredMobilePlugin.addListener('newTransaction', async (data: any) => {
+      let request = JSON.parse(data.request);
+      let id = data.id;
+      //MUST DO CHECKS FOR REAL TX AND SIGS
+      console.log(JSON.stringify(request));
+
+      let tx = this.evalTx(request);
+      if (tx.sig) {
+        console.log('CONFIRM');
+        this.txData = {
+          data: request,
+          handler: async (confirmed) => {
+            if (confirmed) {
+              this.loadService.sendRequest(request, async (result) => {
+                ThredMobilePlugin.toggleAppVisible({ visible: true });
+                ThredMobilePlugin.sendResponse({ data: result, id });
+                this.txData = undefined;
+              });
+            } else {
+              ThredMobilePlugin.toggleAppVisible({ visible: true });
+              ThredMobilePlugin.sendResponse({ data: null, id });
+              this.txData = undefined;
+            }
+          },
+        };
+        this.cdr.detectChanges();
+
+        setTimeout(() => {
+          ThredMobilePlugin.toggleAppVisible({ visible: false });
+        }, 500);
+      } else {
+        console.log('NO CONFIRM');
+        this.loadService.sendRequest(request, (result) => {
+          ThredMobilePlugin.sendResponse({ data: result, id });
+        });
+      }
+    });
+  }
+
+  txData?: {
+    data: any;
+    handler: (confirmed: boolean) => any;
+  };
+
+  evalTx(request: Dict<any>) {
+    let method = request['method'] as string;
+    let params = request['params'] as any[];
+
+    switch (method) {
+      case 'personal_sign':
+        return { sig: true, params };
+      case 'eth_signTypedData_v4':
+        return { sig: true, params };
+      case 'eth_sendTransaction':
+        return { sig: true, params };
+      default:
+        return { sig: false, params };
+    }
   }
 }

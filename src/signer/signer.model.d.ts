@@ -1,7 +1,6 @@
 /// <reference types="node" />
 import EventEmitter from 'events';
 export default class ThredSigner extends EventEmitter {
-    type: number;
     chainId: string;
     chains: any[];
     networkVersion: string;
@@ -21,5 +20,5 @@ export default class ThredSigner extends EventEmitter {
         params: any[];
         chainId?: string;
     }): Promise<any>;
-    constructor(type?: number, chains?: any[], networkVersion?: number, maskOtherWallets?: boolean, autoRefresh?: boolean, selectedAddress?: string);
+    constructor(chains?: any[], networkVersion?: number, maskOtherWallets?: boolean, autoRefresh?: boolean, selectedAddress?: string);
 }

@@ -46,14 +46,9 @@ class ThredMobileCore : Plugin() {
         bottomMargin = 0
       }
 
-      System.out.println(topMargin)
-      System.out.println(bottomMargin)
-
       val appMargins = mutableMapOf<String, Int>()
       appMargins["bottom"] = bottomMargin
       appMargins["top"] = topMargin
-
-      System.out.println(appMargins)
 
       TBridgeActivity.getInstanceActivity()?.toggleAppVisibility(1, app, signer, appMargins)
     }
@@ -70,7 +65,7 @@ class ThredMobileCore : Plugin() {
   @PluginMethod
   fun toggleAppVisible(call: PluginCall) {
     val show = call.getBoolean("visible")
-    var toggle: Int? = null
+    val toggle: Int?
     if (show != null){
       toggle = if (show){
         3
@@ -81,22 +76,11 @@ class ThredMobileCore : Plugin() {
     }
   }
 
-  private fun makeMap(name: String, data: String): MutableMap<String, String>{
-    var map = mutableMapOf<String, String>()
-
-    map["name"] = name
-    map["data"] = data
-
-    return map
-  }
-
   fun confirmTransaction(txData: String, replyHandler: (result: Any?) -> Unit){
 
     val uuid = UUID.randomUUID().toString()
 
     handlers[uuid] = replyHandler
-
-    System.out.println("\n\n\n" + txData + "\n\n\n")
 
     val ret = JSObject()
     ret.put("request", txData)

@@ -4,4 +4,6 @@
     <string name="title_activity_main">Thred</string>
     <string name="package_name">com.thredwallet.app</string>
     <string name="custom_url_scheme">com.thredwallet.app</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

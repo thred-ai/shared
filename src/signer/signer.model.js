@@ -56,8 +56,7 @@ exports.__esModule = true;
 var events_1 = __importDefault(require("events"));
 var ThredSigner = /** @class */ (function (_super) {
     __extends(ThredSigner, _super);
-    function ThredSigner(type, chains, networkVersion, maskOtherWallets, autoRefresh, selectedAddress) {
-        if (type === void 0) { type = 0; }
+    function ThredSigner(chains, networkVersion, maskOtherWallets, autoRefresh, selectedAddress) {
         if (chains === void 0) { chains = []; }
         if (networkVersion === void 0) { networkVersion = 1; }
         if (maskOtherWallets === void 0) { maskOtherWallets = true; }
@@ -65,11 +64,9 @@ var ThredSigner = /** @class */ (function (_super) {
         var _this = _super.call(this) || this;
         _this._metamask = {
             isUnlocked: function () {
-                console.log('check unlocked');
                 return Promise.resolve(true);
             }
         };
-        _this.type = type;
         _this.chainId = "0x".concat(networkVersion.toString(16));
         _this.chains = chains;
         _this.networkVersion = String(networkVersion);
@@ -80,7 +77,6 @@ var ThredSigner = /** @class */ (function (_super) {
         return _this;
     }
     ThredSigner.prototype.enable = function () {
-        console.log('enabling');
         try {
             var data = {
                 method: 'eth_accounts',
@@ -95,12 +91,10 @@ var ThredSigner = /** @class */ (function (_super) {
         }
     };
     ThredSigner.prototype.isConnected = function () {
-        console.log('check connected');
         return Promise.resolve(true);
     };
     ThredSigner.prototype.send = function (method, params) {
         if (params === void 0) { params = {}; }
-        console.log('normal send');
         try {
             return this.request({ method: method, params: params });
         }
@@ -114,7 +108,6 @@ var ThredSigner = /** @class */ (function (_super) {
         console.log(JSON.stringify(req));
     };
     ThredSigner.prototype.sendAsync = function (req, callback) {
-        console.log('sending async');
         try {
             var jsonrpc_1 = req.jsonrpc;
             var id_1 = req.id;
@@ -134,24 +127,19 @@ var ThredSigner = /** @class */ (function (_super) {
     };
     ThredSigner.prototype.connect = function (req) { };
     ThredSigner.prototype.request = function (req) {
-        var _a, _b, _c, _d;
+        var _a, _b;
         return __awaiter(this, void 0, void 0, function () {
-            var method, params, chainId, chain, data, value, value, call, w, callData, rawData, returnData, err, err, e_1;
-            return __generator(this, function (_e) {
-                switch (_e.label) {
+            var method, params, chainId, chain, data, value, value, w, callData, rawData, returnData, err, err, e_1;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
                     case 0:
-                        console.log('requesting');
                         method = req.method;
                         params = req.params;
                         chainId = (_a = req.chainId) !== null && _a !== void 0 ? _a : this.networkVersion;
-                        console.log(JSON.stringify(req));
                         if (!(method === 'eth_chainId')) return [3 /*break*/, 1];
-                        console.log('GET CHAIN ID');
-                        console.log(this.chainId);
                         return [2 /*return*/, Promise.resolve(this.chainId)];
                     case 1:
                         if (!(method === 'wallet_switchEthereumChain')) return [3 /*break*/, 2];
-                        console.log('SWITCH CHAIN ID');
                         chain = (_b = params[0].chainId) !== null && _b !== void 0 ? _b : '0x1';
                         this.chainId = chain;
                         this.networkVersion = String(parseInt(this.chainId, 16));
@@ -165,10 +153,9 @@ var ThredSigner = /** @class */ (function (_super) {
                         };
                         if (method === 'personal_sign') {
                             data.params[0] = params[0].slice(2);
-                            console.log('SIGN MSG');
+                            console.log("sign message");
                         }
                         else if (method === 'eth_sendTransaction') {
-                            console.log('SEND TX');
                             value = data.params[0].value;
                             if (!value) {
                                 data.params[0].value = '0x0';
@@ -176,10 +163,8 @@ var ThredSigner = /** @class */ (function (_super) {
                             }
                             data.displayValue = value;
                             data.symbol = this.chains.find(function (c) { return String(c.id) == String(data.chainId); }).currency;
-                            console.log(JSON.stringify(data));
                         }
                         else if (method === 'eth_signTypedData_v4') {
-                            console.log('SIGN DATA');
                             data.params[1] = JSON.parse(data.params[1]);
                         }
                         else if (method === 'eth_estimateGas') {
@@ -188,28 +173,15 @@ var ThredSigner = /** @class */ (function (_super) {
                                 data.params[0].value = '0x0';
                             }
                         }
-                        _e.label = 3;
+                        _c.label = 3;
                     case 3:
-                        _e.trys.push([3, 5, , 6]);
+                        _c.trys.push([3, 5, , 6]);
                         w = window;
                         callData = JSON.stringify(data);
-                        if (this.type == 0 && ((_d = (_c = w.webkit) === null || _c === void 0 ? void 0 : _c.messageHandlers) === null || _d === void 0 ? void 0 : _d.thred_request)) {
-                            call = w.webkit.messageHandlers.thred_request.postMessage(callData);
-                            console.log('injected');
-                        }
-                        else if (w.thred_request) {
-                            call = w.thred_request(callData);
-                            console.log('native');
-                        }
-                        else {
-                            call = Promise.resolve(null);
-                        }
-                        return [4 /*yield*/, call];
+                        return [4 /*yield*/, w.thred_request(callData)];
                     case 4:
-                        rawData = _e.sent();
+                        rawData = _c.sent();
                         returnData = rawData ? JSON.parse(rawData) : null;
-                        console.log('RETURNED');
-                        console.log(rawData);
                         try {
                             if (returnData.data == '0x') {
                                 returnData.data = null;
@@ -226,11 +198,8 @@ var ThredSigner = /** @class */ (function (_super) {
                             }
                             if (method == 'eth_requestAccounts' || method == 'eth_accounts') {
                                 this.selectedAddress = returnData.data[0];
-                                console.log(this.selectedAddress);
-                                console.log(JSON.stringify(this.eventNames()));
                                 this.emit('connect', { chainId: this.chainId });
                             }
-                            console.log(JSON.stringify(returnData.data));
                             return [2 /*return*/, Promise.resolve(returnData.data)];
                         }
                         catch (error) {
@@ -239,7 +208,7 @@ var ThredSigner = /** @class */ (function (_super) {
                         }
                         return [3 /*break*/, 6];
                     case 5:
-                        e_1 = _e.sent();
+                        e_1 = _c.sent();
                         console.log(e_1.message);
                         return [2 /*return*/, Promise.reject(e_1.message)];
                     case 6: return [2 /*return*/];

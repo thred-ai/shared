@@ -48,17 +48,12 @@ export class LoadService {
     private functions: AngularFireFunctions,
     private storage: AngularFireStorage,
     public thredService: ThredCoreService,
-    private authService: AuthService,
+    private authService: AuthService
   ) {
-
-    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
     // this.auth.signOut();
     this.initProviders();
-
-    
-    
-
   }
 
   installChains(getBalances = false, wallet?: string) {
@@ -67,7 +62,6 @@ export class LoadService {
       // (window as any).webkit?.messageHandlers?.chains.postMessage(
       //   JSON.stringify(chains)
       // );
-      console.log('CHAINS -- ' + JSON.stringify(chains));
       this.loadedChains.next(chains);
     });
   }
@@ -88,15 +82,12 @@ export class LoadService {
       let payload = data;
       // payload.id = await (window as any).thred();
       payload.wallet = this.loadedWallet.value?.id;
-      console.log(JSON.stringify(payload));
       this.functions
         .httpsCallable('transact')(payload)
         .pipe(first())
         .toPromise()
         .then(async (resp) => {
           if (resp) {
-            console.log(JSON.stringify(resp));
-
             callback(
               JSON.stringify({ success: true, error: null, data: resp })
             );
@@ -108,7 +99,6 @@ export class LoadService {
         });
     } catch (error: any) {
       console.log(error.message);
-      console.log(JSON.stringify(error));
       callback(JSON.stringify({ success: false, error, data: null }));
     }
 
@@ -178,7 +168,6 @@ export class LoadService {
     }
   }
 
-
   openItem(id: string) {
     this.router.navigateByUrl(`/apps/${id}`);
   }
@@ -203,26 +192,25 @@ export class LoadService {
     this.router.navigateByUrl(`/home`);
   }
 
-
   async getChains(
     getBalances = false,
     wallet: string | undefined = undefined,
     callback: (result: Chain[]) => any
   ) {
-    console.log("chains")
-    console.log(getBalances)
-    console.log(wallet)
-
     // let thred = (window as any)?.thred;
-    this.functions
-      .httpsCallable('getChainsForWallet')({
-        getBalances,
-      })
-      .pipe(first())
-      .subscribe(async (resp) => {
-        let chains = this.thredService.syncChains(resp);
-        callback(chains);
-      });
+    try {
+      this.functions
+        .httpsCallable('getChainsForWallet')({
+          getBalances,
+        })
+        .pipe(first())
+        .subscribe(async (resp) => {
+          let chains = this.thredService.syncChains(resp);
+          callback(chains);
+        });
+    } catch (error) {
+      callback([]);
+    }
   }
 
   async saveUserInfo(
@@ -263,7 +251,6 @@ export class LoadService {
       callback(undefined);
     }
   }
-
 
   filteredSearch: BehaviorSubject<any> = new BehaviorSubject([]);
 
@@ -311,7 +298,6 @@ export class LoadService {
   //         });
   //     });
   // }
-
 
   getUserInfo(
     uid: string,
@@ -405,7 +391,6 @@ export class LoadService {
     }
   }
 
-
   getTokensForNetwork(
     chain: number,
     address: string,
@@ -441,19 +426,16 @@ export class LoadService {
         });
     } catch (error: any) {
       console.log(error.message);
-      console.log(JSON.stringify(error));
       callback();
     }
   }
 
   async loadNFTs(nftList: NFTList, callback: (nfts: NFT[]) => any) {
-    console.log("nfts")
     this.functions
       .httpsCallable('getNFTsForWallet')({ nftList })
       .pipe(first())
       .subscribe(
         async (resp) => {
-          console.log(resp);
           callback(resp);
         },
         (err) => {
@@ -464,14 +446,12 @@ export class LoadService {
   }
 
   async loadNFTsByWallet(uid: string, callback: (nfts: NFT[]) => any) {
-    console.log("nfts wallet")
     if (uid) {
       this.functions
         .httpsCallable('getNFTsByWallet')({ uid })
         .pipe(first())
         .subscribe(
           async (resp) => {
-            console.log(resp);
             callback(resp);
           },
           (err) => {
@@ -489,21 +469,37 @@ export class LoadService {
     callback: (result?: Wallet) => any,
     getProfiles = false
   ) {
-    console.log("wallet");
-
     this.functions
       .httpsCallable('getWallet')({ id })
       .pipe(first())
       .subscribe(
         async (resp) => {
           // this.loadedChains.next(resp);
-          console.log('chains oy');
           let util = this.thredService.syncWallet(
             resp,
             this.loadedChains.value
           );
 
           callback(util);
+        },
+        (err) => {
+          console.error({ err });
+          callback(undefined);
+        }
+      );
+  }
+
+  getRequest(
+    type: 'signature' | 'transaction',
+    request: Dict<any>,
+    callback: (result?: any) => any
+  ) {
+    this.functions
+      .httpsCallable('getRequest')({ type, request })
+      .pipe(first())
+      .subscribe(
+        async (resp) => {
+          callback(resp ?? undefined);
         },
         (err) => {
           console.error({ err });

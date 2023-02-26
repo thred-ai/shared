@@ -1,30 +1,42 @@
 <div class="w-100" style="height: 100vh" *ngIf="activeWallet && activeLayout">
-  <ng-container *ngIf="signedIn; else auth">
-    <thred-page
-      *ngIf="activePage"
-      [editable]="false"
-      [layout]="activeLayout"
-      [currentPage]="activePage"
-      [defaultItems]="{ '6': loadedNFTs, '7': activeWallet.chains }"
-      (pageChanged)="pageChanged($event)"
-      [pageDetails]="{}"
-      [accountDetails]="activePage.page.type == 2 ? {user} : undefined"
-      (refreshed)="reload()"
-      (clickedItem)="handleClick($event)"
-      [safeArea]="{bottom: safeAreaBottom, top: safeAreaTop}"
-    >
-    </thred-page>
+  <ng-container *ngIf="signedIn && activePage; else auth">
+    <ng-container *ngIf="txData">
+      <app-transaction-dialog
+        [data]="txData.data"
+        [safeArea]="{top: safeAreaTop, bottom: safeAreaBottom}"
+        [page]="activePage.page"
+        (confirmed)="txData.handler($event)"
+      >
+      </app-transaction-dialog>
+    </ng-container>
+    <ng-container *ngIf="!txData">
+      <thred-page
+        [editable]="false"
+        [layout]="activeLayout"
+        [page]="activePage.page"
+        [pageIndex]="activePage.index"
+        [defaultItems]="{ '6': loadedNFTs, '7': activeWallet.chains }"
+        (pageChanged)="pageChanged($event)"
+        [pageDetails]="{}"
+        [accountDetails]="activePage.page.type == 2 ? {user} : undefined"
+        (refreshed)="reload()"
+        (clickedItem)="handleClick($event)"
+        [safeArea]="{ bottom: safeAreaBottom, top: safeAreaTop }"
+      >
+      </thred-page>
+    </ng-container>
   </ng-container>
   <ng-template #auth>
     <thred-page
       *ngIf="!loading"
       [editable]="false"
       [layout]="activeLayout"
-      [currentPage]="{ page: activeLayout.authPage, index: 0 }"
+      [page]="activeLayout.authPage"
+      [pageIndex]="0"
       [authDetails]="authDetails"
       [pageDetails]="{}"
       (authUpdated)="parseAuth($event)"
-      [safeArea]="{bottom: safeAreaBottom, top: safeAreaTop}"
+      [safeArea]="{ bottom: safeAreaBottom, top: safeAreaTop }"
     >
     </thred-page>
   </ng-template>

@@ -1,1 +1,28 @@
-<p>transaction-dialog works!</p>
+<ng-container *ngIf="page && txData">
+  <div
+    class="w-100 h-100 px-2"
+    [style.padding-top.px]="safeArea.top"
+    [style.padding-bottom.px]="safeArea.bottom"
+    [style.color]="page.textColor"
+    [style.background-color]="page.backgroundColor"
+  >
+    <div
+      class="w-100 m-auto d-flex justify-content-between align-items-center flex-column rounded-15 shadow"
+      style="border-style: solid; border-width: 1px"
+      [style.border-color]="page.detailColor"
+    >
+      <div class="text-center m-auto">
+        <h1 class="w-100">{{ title }}</h1>
+      </div>
+    </div>
+    <div
+      class="w-100 m-auto d-flex justify-content-between align-items-center flex-column rounded-15 shadow"
+      style="border-style: solid; border-width: 1px"
+      [style.border-color]="page.detailColor"
+    >
+      <div class="text-center m-auto">
+        <h1 class="w-100">{{ title }}</h1>
+      </div>
+    </div>
+  </div>
+</ng-container>

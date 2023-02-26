@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 import ThredSigner from 'src/signer/signer.model';
 import { ThredMobilePlugin } from 'src/ThredCorePlugin';
 import { App } from 'thred-core';
-import { LoadService } from './load.service';
+import { Dict, LoadService } from './load.service';
 import { SignerService } from './signer.service';
 
 @Component({
@@ -18,27 +18,6 @@ export class AppComponent {
   signedIn?: Boolean;
   uid?: string;
 
-  tabs = [
-    {
-      name: 'Discover',
-      icon: 'search',
-      link: '/store',
-      hide: '0x54Da21443C8D97B3aac5067Fd0B21c359D343Ea2',
-    },
-    {
-      name: 'My Apps',
-      icon: 'apps',
-      link: '/home',
-      hide: '0x54Da21443C8D97B3aac5067Fd0B21c359D343Ea2',
-    },
-    {
-      name: 'Account',
-      icon: 'account_balance_wallet',
-      link: '/account',
-      hide: null,
-    },
-  ];
-
   constructor(
     private router: ActivatedRoute,
     private _router: Router,
@@ -46,14 +25,7 @@ export class AppComponent {
     private signerService: SignerService
   ) {}
 
-  async openApp(data: App) {
-    // this.dialog.open(AppWindowComponent, {
-    //   width: '2000px',
-    //   maxHeight: '100vh',
-    //   maxWidth: '100vw',
-    //   panelClass: 'app-full-bleed-dialog',
-    //   data,
-    // });
+  async openApp(data: App, margins: Dict<any>) {
     if (this.loadService.loadedChains.value) {
       let injectedSigner = (await this.signerService.getSigner(
         0,
@@ -61,16 +33,14 @@ export class AppComponent {
         data.defaultChain ?? 1
       )) as string;
       if (injectedSigner) {
-        console.log(injectedSigner)
         ThredMobilePlugin.openApp(
-          JSON.parse(JSON.stringify({ app: data, signer: injectedSigner }))
+          JSON.parse(JSON.stringify({ app: data, signer: injectedSigner, margins }))
         );
       }
     }
   }
 
   async ngOnInit() {
-    console.log('oi cunt');
     this.loadService.loadedUser.subscribe((user) => {
       this.uid = user?.id;
       // if (!user){
@@ -85,7 +55,6 @@ export class AppComponent {
           chains,
           Number((window as any)?.ethereum?.networkVersion ?? '1')
         )) as ThredSigner;
-        console.log(nativeSigner);
         try {
           let w = window as any;
           if (nativeSigner && w) {
@@ -99,25 +68,6 @@ export class AppComponent {
 
     document.body.classList.add('bar');
 
-    // if ((window as any).newInstance ?? false) {
-    //   this.butterfly?.beginFlyAnimation();
-    // }
-
-    const myPluginEventListener = await ThredMobilePlugin.addListener(
-      'newTransaction',
-      (data: any) => {
-        let request = JSON.parse(data.request);
-        let id = data.id;
-        //MUST DO CHECKS FOR REAL TX AND SIGS
-
-        this.loadService.sendRequest(request, (result) => {
-          console.log(result);
-          ThredMobilePlugin.sendResponse({ data: result, id });
-        });
-
-        console.log(request);
-      }
-    );
   }
 
   isLocation(locations: string[]) {

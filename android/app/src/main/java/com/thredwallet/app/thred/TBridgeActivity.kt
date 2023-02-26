@@ -1,3 +1,4 @@
+//noinspection SuspiciousImport
 import android.R
 import android.os.Bundle
 import android.view.Gravity
@@ -5,17 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.TranslateAnimation
 import android.widget.FrameLayout
-import androidx.annotation.IdRes
+import android.widget.ImageButton
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.Fragment
 import com.getcapacitor.BridgeActivity
-import com.thredwallet.app.AppFragment
 import java.lang.ref.WeakReference
 
 open class TBridgeActivity : BridgeActivity() {
   var thredCore: ThredMobileCore? = null
   private var existingFragment: AppFragment? = null
-  var fragmentFrame: FrameLayout? = null
+  private var fragmentFrame: FrameLayout? = null
 
   companion object {
     var weakActivity: WeakReference<TBridgeActivity>? = null
@@ -73,35 +73,38 @@ open class TBridgeActivity : BridgeActivity() {
 
   fun toggleAppVisibility(toggle: Int, app: String?, signer: String?, margins: Map<String, Int>?){
 
-    if (toggle == 1 && app != null && signer != null) {
-      newAppFragment(app, signer, margins)
-      if (fragmentFrame as? FrameLayout != null){
-        slideUp(fragmentFrame as FrameLayout)
+    runOnUiThread {
+      if (toggle == 1 && app != null && signer != null) {
+        newAppFragment(app, signer, margins)
+        if (fragmentFrame != null){
+          slideUp(fragmentFrame as FrameLayout)
+        }
+      } else if (toggle == 2){
+        if (fragmentFrame != null) {
+          slideDown(fragmentFrame as FrameLayout)
+        }
+        removeFragments()
       }
-    } else if (toggle == 2){
-      if (fragmentFrame as? FrameLayout != null) {
-        slideDown(fragmentFrame as FrameLayout)
+      else if (toggle == 3){
+        if (existingFragment != null){
+          showFragment(existingFragment as AppFragment)
+        }
       }
-      removeFragments()
-    }
-    else if (toggle == 3){
-      if (existingFragment as? AppFragment != null){
-        showFragment(existingFragment as AppFragment)
-      }
-    }
-    else if(toggle == 4){
-      if (existingFragment as? AppFragment != null){
-        hideFragment(existingFragment as AppFragment)
+      else if(toggle == 4){
+        if (existingFragment != null){
+          hideFragment(existingFragment as AppFragment)
+        }
       }
     }
   }
 
+
   private fun addFragment(
     fragment: Fragment,
   ) {
-    val frame = fragmentFrame as? FrameLayout
+    val frame = fragmentFrame
     if (frame != null){
-      frame?.visibility = View.VISIBLE
+      frame.visibility = View.VISIBLE
       supportFragmentManager
         .beginTransaction()
         .add(frame.id, fragment)
@@ -109,6 +112,7 @@ open class TBridgeActivity : BridgeActivity() {
         .commit()
     }
   }
+
 
   // slide the view from below itself to the current position
   private fun slideUp(view: FrameLayout) {
@@ -137,19 +141,6 @@ open class TBridgeActivity : BridgeActivity() {
     view.startAnimation(animate)
   }
 
-  fun replaceFragment(
-    @IdRes containerViewId: Int,
-    fragment: Fragment,
-    fragmentTag: String,
-    backStackStateName: String?
-  ) {
-    supportFragmentManager
-      .beginTransaction()
-      .replace(containerViewId, fragment, fragmentTag)
-      .addToBackStack(backStackStateName)
-      .commit()
-  }
-
   private fun hideFragment(fragment: Fragment){
 
     supportFragmentManager.beginTransaction().hide(fragment).commit()
@@ -160,10 +151,20 @@ open class TBridgeActivity : BridgeActivity() {
   }
 
   private fun removeFragments() {
-    val frame = fragmentFrame as? FrameLayout
+    val frame = fragmentFrame
     frame?.visibility = View.GONE
     existingFragment = null
 
-    supportFragmentManager.popBackStackImmediate()
+    frame?.removeAllViews()
   }
+
+  fun setButtonClick() {
+
+    (findViewById<View>(com.thredwallet.app.R.id.imageButton) as? ImageButton)?.setOnClickListener {
+      toggleAppVisibility(2, null, null, null)
+    }
+  }
+
 }
+
+

@@ -20,17 +20,14 @@ export class SignerService {
       let constructor = `
       
       window.ethereum = new ThredSigner.default(
-        ${mode},
         ${this.initChains(chains, mode, currency)},
         ${initialNetwork}
       )
-      
       `;
 
       return `${assembly} ${constructor}`;
     } else {
       return new ThredSigner(
-        mode,
         this.initChains(chains, mode, currency) as any[],
         initialNetwork
       );

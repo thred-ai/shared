@@ -93,7 +93,6 @@ export class AuthService {
 
   async signOut(root: AppComponent, callback: (result: boolean) => any) {
     try {
-      //console.log("SIGNING OUT")
       await this.auth.signOut();
       await (window as any).webkit.messageHandlers.remove_key.postMessage('');
       root.signedIn = false;
@@ -109,7 +108,6 @@ export class AuthService {
     wallet: string,
     callback: (user?: User, hex?: any) => any
   ) {
-    console.log("create")
     this.functions
       .httpsCallable('createNewUser')({ id: hex, isEmail: true, wallet })
       .pipe(first())
@@ -163,7 +161,6 @@ export class AuthService {
     wallet: string,
     callback: (user?: User, hex?: any) => any
   ) {
-    console.log("sign in")
     this.functions
       .httpsCallable('signInUser')({ id: hex, isEmail: true, wallet })
       .pipe(first())
@@ -212,7 +209,6 @@ export class AuthService {
   }
 
   verifyUser(hex: string, callback: (user?: User, hex?: any) => any) {
-    console.log("verify")
     this.functions
       .httpsCallable('verifyUser')({ id: hex })
       .pipe(first())
@@ -265,7 +261,6 @@ export class AuthService {
     wallet: string,
     callback: (user?: User, hex?: any) => any
   ) {
-    console.log("import")
     this.functions
       .httpsCallable('signInUser')({ id: hex, isEmail: false, wallet })
       .pipe(first())
@@ -314,7 +309,6 @@ export class AuthService {
   }
 
   newUser(wallet: string, callback: (user?: User, hex?: any) => any) {
-    console.log("new")
     this.functions
       .httpsCallable('createNewUser')({ isEmail: false, wallet })
       .pipe(first())

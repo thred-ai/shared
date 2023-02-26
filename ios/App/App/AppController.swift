@@ -15,6 +15,7 @@ class AppController: UIViewController, WKNavigationDelegate, WKScriptMessageHand
     var app: [String : Any]?
     var injectedSigner: String!
     var thredCore: ThredMobileCore?
+    var hidden = true
     
     @IBOutlet weak var webView: WKWebView!
     
@@ -27,9 +28,9 @@ class AppController: UIViewController, WKNavigationDelegate, WKScriptMessageHand
             let finalUrl = URLRequest(url: url)
             self.webView.load(finalUrl)
         }
-        print("opened")
         // Do any additional setup after loading the view.
     }
+    
     
     @available(iOS 14.0, *)
     func setWebviewConfig(){
@@ -53,8 +54,14 @@ class AppController: UIViewController, WKNavigationDelegate, WKScriptMessageHand
         //set request handler
         webView.configuration.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: "thred_request")
         
+        //inject request redirect
+        let script1 = WKUserScript(source: "function request(data) { return window.webkit.messageHandlers.thred_request.postMessage(data); } window.thred_request = request;", injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        
+        webView.configuration.userContentController.addUserScript(script1)
+        
         //inject log redirect
         let script3 = WKUserScript(source: "function captureLog(msg) { window.webkit.messageHandlers.log.postMessage(msg); } window.console.log = captureLog;", injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        
         webView.configuration.userContentController.addUserScript(script3)
         
         //set log

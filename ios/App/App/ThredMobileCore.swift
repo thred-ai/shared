@@ -6,7 +6,6 @@
 //
 
 import Capacitor
-import MaterialComponents.MaterialBottomSheet
 
 @objc(ThredMobileCore)
 public class ThredMobileCore: CAPPlugin {
@@ -27,84 +26,34 @@ public class ThredMobileCore: CAPPlugin {
             print(data)
             replyHandler(data)
             handlers[id] = nil
-        }//
+        }
+    }
+    
+    @objc func toggleAppVisible(_ call: CAPPluginCall) {
+        print("toggling")
+
+        DispatchQueue.main.async {
+            if let toggle = call.getBool("visible"), let appVC = self.appVC, let vc = self.bridge?.viewController as? CAPBridgeViewController{
+                if toggle{
+                    vc.present(appVC, animated: false, completion: nil)
+                }
+                else{
+                    appVC.dismiss(animated: false)
+                }
+            }
+        }
     }
     
     func confirmTransaction(txData: String, replyHandler: @escaping (Any) -> ()){
-        if let vc = self.bridge?.viewController as? CAPBridgeViewController, let mainApp = vc.webView{
             
             let uuid = UUID().uuidString
             
             self.handlers[uuid] = replyHandler
-
+                    
             self.notifyListeners("newTransaction", data: ["request": txData, "id": uuid])
-
-//            if method == "personal_sign" && !params.isEmpty{
-//                let msg = params[0] as? String ?? "No Message"
-//
-//    //                thredCore?.
-//    //                self.handler = { signed in
-//    //                    if (signed){
-//    //                        vc.postMessage(data: messageBody, replyHandler: { data in
-//    //                            replyHandler( data, nil )
-//    //                        })
-//    //                    }
-//    //                    else{
-//    //                        let err = """
-//    //                        "rejected"
-//    //                        """
-//    //                        print(err)
-//    //                        replyHandler(err, nil)
-//    //                    }
-//    //                    self.handler = nil
-//    //                }
-//
-//            }
-//            else if method == "eth_signTypedData_v4" && !params.isEmpty{
-//    //            guard let dataParams = params[1] as? [String:Any], let msg = dataParams["message"] as? [String:Any] else{ replyHandler(nil, nil); return }
-//    //                self.handler = { signed in
-//    //                    if (signed){
-//    //                        vc.postMessage(data: messageBody, replyHandler: { data in
-//    //                            replyHandler( data, nil )
-//    //                        })
-//    //                    }
-//    //                    else{
-//    //                        let err = """
-//    //                        "rejected"
-//    //                        """
-//    //                        print(err)
-//    //                        replyHandler(err, nil)
-//    //                    }
-//    //                    self.handler = nil
-//    //                }
-//    //                self.showPopup(text: msg, title: "Sign Message", value: nil, currency: nil)
-//            }
-//            else if method == "eth_sendTransaction" && !params.isEmpty{
-//
-//    //                self.handler = { signed in
-//    //                    if (signed){
-//    //                        vc.postMessage(data: messageBody, replyHandler: { data in
-//    //                            replyHandler( data, nil )
-//    //                        })
-//    //                    }
-//    //                    else{
-//    //                        let err = """
-//    //                        "rejected"
-//    //                        """
-//    //                        print(err)
-//    //                        replyHandler(err, nil)
-//    //                    }
-//    //                    self.handler = nil
-//    //                }
-//    //                self.showPopup(text: customMessage(data: json), title: "Transaction Details", value: json["displayValue"] as? String ?? "0", currency: json["symbol"] as? String)
-//
-//            }
-//            else{
-//    //                vc.postMessage(data: messageBody, replyHandler: { data in
-//    //                    replyHandler( data, nil )
-//    //                })
-//            }
-        }
+                    
+            
+        
     }
     
     
@@ -133,37 +82,4 @@ public class ThredMobileCore: CAPPlugin {
         }
     }
     
-    @objc func confirmTransaction(_ call: CAPPluginCall) {
-        if let style = call.getString("path"), let vc = bridge?.viewController as? CAPBridgeViewController{
-            DispatchQueue.main.async{
-//                // View controller the bottom sheet will hold
-//                let viewController: ViewController = ViewController()
-//                // Initialize the bottom sheet with the view controller just created
-//                let bottomSheet: MDCBottomSheetController = MDCBottomSheetController(contentViewController: viewController)
-//                // Present the bottom sheet
-//                vc.present(bottomSheet, animated: true, completion: nil)
-            }
-        }
-        
-        
-//        let photos = PHPhotoLibrary.authorizationStatus()
-//        if photos == .notDetermined {
-//            PHPhotoLibrary.requestAuthorization({status in
-//                if status == .authorized{
-//                    let fetchOptions = PHFetchOptions()
-//                    fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-//                    fetchOptions.fetchLimit = 1
-//                    let fetchResult = PHAsset.fetchAssets(with: .image, options: fetchOptions)
-//                    let image = self.getAssetThumbnail(asset: fetchResult.object(at: 0))
-//                    let imageData:Data =  image.pngData()!
-//                    let base64String = imageData.base64EncodedString()
-//                    call.resolve([
-//                        "image": base64String
-//                    ])
-//                } else {
-//                    call.reject("Not authorised to access Photos")
-//                }
-//            })
-//        }
-    }
 }
