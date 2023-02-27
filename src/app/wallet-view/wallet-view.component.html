@@ -21,6 +21,7 @@
         [accountDetails]="activePage.page.type == 2 ? {user} : undefined"
         (refreshed)="reload()"
         (clickedItem)="handleClick($event)"
+        (signOut)="signOut()"
         [safeArea]="{ bottom: safeAreaBottom, top: safeAreaTop }"
       >
       </thred-page>

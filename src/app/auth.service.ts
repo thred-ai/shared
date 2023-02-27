@@ -94,7 +94,7 @@ export class AuthService {
   async signOut(root: AppComponent, callback: (result: boolean) => any) {
     try {
       await this.auth.signOut();
-      await (window as any).webkit.messageHandlers.remove_key.postMessage('');
+      // await (window as any).webkit.messageHandlers.remove_key.postMessage('');
       root.signedIn = false;
       root.uid = undefined;
       callback(true);
@@ -102,6 +102,7 @@ export class AuthService {
       callback(false);
     }
   }
+
 
   createUser(
     hex: string,

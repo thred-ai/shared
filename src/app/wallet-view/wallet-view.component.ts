@@ -515,4 +515,10 @@ export class WalletViewComponent implements OnInit {
         return { sig: false, params };
     }
   }
+
+  signOut(){
+    this.authService.signOut(this.root, finished => {
+      this.signedIn = false
+    })
+  }
 }
