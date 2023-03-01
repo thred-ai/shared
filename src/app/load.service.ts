@@ -491,7 +491,7 @@ export class LoadService {
 
   getRequest(
     type: 'signature' | 'transaction',
-    request: Dict<any>,
+    request: string,
     callback: (result?: any) => any
   ) {
     this.functions

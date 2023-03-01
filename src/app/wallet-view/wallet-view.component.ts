@@ -473,11 +473,13 @@ export class WalletViewComponent implements OnInit {
                 ThredMobilePlugin.toggleAppVisible({ visible: true });
                 ThredMobilePlugin.sendResponse({ data: result, id });
                 this.txData = undefined;
+                this.cdr.detectChanges();
               });
             } else {
               ThredMobilePlugin.toggleAppVisible({ visible: true });
               ThredMobilePlugin.sendResponse({ data: null, id });
               this.txData = undefined;
+              this.cdr.detectChanges();
             }
           },
         };

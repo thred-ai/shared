@@ -48,14 +48,14 @@ export class TransactionDialogComponent implements OnInit {
     setTimeout(() => {
       this.confirmed.emit(true);
     }, 5000);
-    // this.loadService.getRequest(this.mode, this.txData, (result) => {
-    //   console.log(result);
-    //   this.request = result;
+    this.loadService.getRequest(this.mode, JSON.stringify(this.txData), (result) => {
+      console.log(result);
+      this.request = result;
 
-    //   setTimeout(() => {
-    //     this.confirmed.emit(true);
-    //   }, 2000);
-    // });
+      setTimeout(() => {
+        this.confirmed.emit(true);
+      }, 2000);
+    });
 
     // let oy = {
     //   risk: { riskScore: 'LOW', riskFactors: [] },

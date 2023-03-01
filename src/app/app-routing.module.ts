@@ -12,7 +12,7 @@ const routes: Routes = [
   { path: ':id', component: WalletViewComponent, pathMatch: 'full' },
 
 
-  // { path: '', redirectTo: '/wallet/JZ4PYdx6bF6tZNwpcBMT', pathMatch: 'full' },
+  { path: '', redirectTo: '/P4Ws3cXfWPKPgRmQF6IK', pathMatch: 'full' },
   // { path: '/:any', redirectTo: '/home', pathMatch: 'full' },
 
 ];
